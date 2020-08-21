@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Calorie Tracker</title>
+  <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+
+  <form>
+    <div>
+      <label>Food name</label><input name="food-name" type="text">
+    </div>
+    <div>
+      <label>Serving size (g)</label><input name="food-serving-size" type="number" min="0">
+    </div>
+    <div>
+      <label>Calories</label><input name="food-calories" type="number" min="0">
+    </div>
+    <input type="submit" value="Save food">
+  </form>
+
+  <table id="saved-foods">
+    <caption>Saved foods</caption>
+    <thead>
+      <tr>
+        <th>Food name</th>
+        <th>Serving size (g)</th>
+        <th>Calories</th>
+        <th></th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr data-food-id="0">
+        <td>Potato</td>
+        <td>100</td>
+        <td>77</td>
+        <td>
+          <button>Add</button>
+          <button>Edit</button>
+          <button>Delete</button>
+        </td>
+      </tr>
+      <tr data-food-id="1">
+        <td>Banana</td>
+        <td>100</td>
+        <td>89</td>
+        <td>
+          <button>Add</button>
+          <button>Edit</button>
+          <button>Delete</button>
+        </td>
+      </tr>
+    </tbody>
+    
+    <tfoot>
+      <tr>
+        <td colspan="4">No created foods</td>
+      </tr>
+    </tfoot>
+
+  </table>
+
+  <script src="main.js"></script>
+
+</body>
+</html>
