@@ -6,19 +6,29 @@
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
+  <h1>Calorie Tracker</h1>
+  <div>
+    <h2>Create food</h2>
 
-  <form>
-    <div>
-      <label>Food name</label><input name="food-name" type="text">
-    </div>
-    <div>
-      <label>Serving size (g)</label><input name="food-serving-size" type="number" min="0">
-    </div>
-    <div>
-      <label>Calories</label><input name="food-calories" type="number" min="0">
-    </div>
-    <input type="submit" value="Save food">
-  </form>
+    <form id="create-food">
+      <div>
+        <label>Food name</label><input name="name" required type="text">
+      </div>
+      <div>
+        <label>Serving size</label><input name="servingSize" required type="number" min="0">
+      </div>
+      <div>
+        <label>Unit (optional)</label><input name="unit" type="text" value="g">
+      </div>
+      <div>
+        <label>Calories</label><input name="calories" required type="number" min="0">
+      </div>
+
+      <input type="submit" value="Create food">
+      <span></span>
+    </form>
+  </div>
+
 
   <table id="saved-foods">
     <caption>Saved foods</caption>
@@ -32,37 +42,13 @@
     </thead>
 
     <tbody>
-      <tr data-food-id="0">
-        <td>Potato</td>
-        <td>100</td>
-        <td>77</td>
-        <td>
-          <button>Add</button>
-          <button>Edit</button>
-          <button>Delete</button>
-        </td>
-      </tr>
-      <tr data-food-id="1">
-        <td>Banana</td>
-        <td>100</td>
-        <td>89</td>
-        <td>
-          <button>Add</button>
-          <button>Edit</button>
-          <button>Delete</button>
-        </td>
-      </tr>
-    </tbody>
-    
-    <tfoot>
       <tr>
         <td colspan="4">No created foods</td>
       </tr>
-    </tfoot>
-
+    </tbody>
   </table>
 
+  <script src="database.js"></script>
   <script src="main.js"></script>
-
 </body>
 </html>
