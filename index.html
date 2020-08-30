@@ -31,23 +31,38 @@
 
 
   <table id="saved-foods">
+
     <caption>Saved foods</caption>
+
     <thead>
       <tr>
         <th>Food name</th>
-        <th>Serving size (g)</th>
+        <th>Serving size</th>
         <th>Calories</th>
         <th></th>
       </tr>
     </thead>
 
     <tbody>
-      <tr>
+      <tr hidden>
         <td colspan="4">No created foods</td>
       </tr>
+
+      <tr hidden data-id="10">
+        <td>Apple</td>
+        <td>100 g</td>
+        <td>52</td>
+        <td>
+          <button>Add to diary</button>
+          <button>Edit</button>
+          <button>Delete</button>
+        </td>
+      </tr>
     </tbody>
+
   </table>
 
+  <script src="helpers.js"></script>
   <script src="database.js"></script>
   <script src="main.js"></script>
 </body>

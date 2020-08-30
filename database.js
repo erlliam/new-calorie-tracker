@@ -1,54 +1,96 @@
 const DATABASE_NAME = "Calorie Tracker";
 const FOOD_SCHEMA = [ "name", "servingSize", "unit", "calories" ];
-let databaseConnection;
 
-function createFood(food) {
+function rejectOnRequestOrTransactionError({
+  reject,
+  request,
+  transaction
+}) {
+  request.onerror = () => { reject(request.error); };
+  transaction.onerror = () => { reject(transaction.error); };
+}
+
+function resolveOnRequestAndTransactionFulfilled({
+  resolve,
+  request,
+  transaction
+}) {
+  request.onsuccess = () => {
+    transaction.oncomplete = () => {
+      resolve();
+    };
+  };
+}
+
+function createFood(databaseConnection, food) {
+  if (!arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA)) {
+    return Promise.reject(Error("food keys don't match schema"));
+  }
+
   return new Promise((resolve, reject) => {
     let transaction = databaseConnection.transaction(
       ["food"], "readwrite");
-    let foodObjectStore = transaction.objectStore("food");
-    let addRequest = foodObjectStore.add(food);
+    let request = transaction.objectStore("food").add(food);
 
-    if (!arraysMatch(Object.keys(food), FOOD_SCHEMA)) {
-      reject("Invalid food structure.");
-    }
+    rejectOnRequestOrTransactionError({reject: reject,
+      request: request, transaction: transaction });
 
-    transaction.onerror = (event) => {
-      reject(`Transaction error: ${transaction.error}`);
-    };
-    addRequest.onerror = (event) => {
-      reject(`Add request error: ${addRequest.error}`);
-    };
-
-    addRequest.onsuccess = (event) => {
-      transaction.oncomplete = (event) => {
-        resolve(`${food.name} created`);
-      };
-    };
+    resolveOnRequestAndTransactionFulfilled({resolve: resolve,
+      request: request, transaction: transaction });
   });
 }
 
-function printAllFoods() {
+function deleteFood(databaseConnection, key) {
+  return new Promise((resolve, reject) => {
+    let transaction = databaseConnection.transaction(
+      ["food"], "readwrite");
+    let request = transaction.objectStore("food").delete(key);
+
+    rejectOnRequestOrTransactionError({reject: reject,
+      transaction: transaction, request: request });
+
+    resolveOnRequestAndTransactionFulfilled({resolve: resolve,
+      request: request, transaction: transaction });
+  });
+}
+
+function displayAllFoods(databaseConnection, table) {
+  let tableBody = table.querySelector("tbody");
   let transaction = databaseConnection.transaction(
     ["food"], "readonly");
-
-  transaction.onerror = (event) => {
-    console.error("printAllFoods: Transaction error.");
-  };
-  transaction.oncomplete = (event) => {
-    console.log("printAllFoods: Transaction complete.");
-  };
-
   let foodObjectStore = transaction.objectStore("food");
-  let nameIndex = foodObjectStore.index("name");
 
-  let getAllRequest = nameIndex.getAll();
-  getAllRequest.onerror = (event) => {
-    console.error("printAllFoods: getAllRequest error.");
-  };
-  getAllRequest.onsuccess = (event) => {
-    console.log("printAllFoods: getAllRequest success.");
-    console.log(getAllRequest.result);
+  let cursorRequest = foodObjectStore.openCursor();
+  cursorRequest.onsuccess = (event) => {
+    let cursor = cursorRequest.result;
+    if (cursor) {
+      let row = document.createElement("tr");
+      row.setAttribute("data-id", cursor.primaryKey);
+
+      let tdName = document.createElement("td");
+      tdName.textContent = cursor.value.name;
+
+      let tdServingSize = document.createElement("td");
+      tdServingSize.textContent =
+        `${cursor.value.servingSize} ${cursor.value.unit}`;
+
+      let tdCalories = document.createElement("td");
+      tdCalories.textContent = cursor.value.calories;
+      
+      let tdButtons = document.createElement("td");
+      tdButtons.innerHTML =
+        `<button>Add to diary</button>
+        <button>Edit</button>
+        <button>Delete</button>`;
+
+      row.appendChild(tdName);
+      row.appendChild(tdServingSize);
+      row.appendChild(tdCalories);
+      row.appendChild(tdButtons);
+      tableBody.appendChild(row);
+
+      cursor.continue();
+    }
   };
 }
 
@@ -61,7 +103,7 @@ function initializeDatabase() {
     };
 
     openRequest.onupgradeneeded = (event) => {
-      createDatabase(openRequest.result);
+      configureDatabase(openRequest.result);
     };
 
     openRequest.onsuccess = (event) => {
@@ -70,7 +112,7 @@ function initializeDatabase() {
   });
 }
 
-function createDatabase(databaseConnection) {
+function configureDatabase(databaseConnection) {
   let foodObjectStore = databaseConnection.createObjectStore(
     "food", { "autoIncrement": true });
 
@@ -89,15 +131,4 @@ function deleteDatabase() {
       resolve(openRequest.result);
     };
   });
-}
-
-// XXX Bad name.
-function arraysMatch(arrayOne, arrayTwo) {
-  if (arrayOne.length !== arrayTwo.length) { return false; }
-
-  for (let i = 0; i < arrayOne.length; i++) {
-    if (!arrayTwo.includes(arrayOne[i])) { return false; }
-  }
-
-  return true;
 }
