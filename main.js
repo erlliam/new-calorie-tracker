@@ -9,6 +9,13 @@ let databaseConnection;
 
     displayAllFoods(databaseConnection, savedFoodsTable);
 
+    // XXX No case insensitive search...
+    // XXX perhaps reject on no results found?
+    let searchResults = await queryFood({
+      databaseConnection: databaseConnection,
+      query: "Potato"
+    });
+    
   } catch(error) {
     console.error(error);
   }
@@ -17,34 +24,16 @@ let databaseConnection;
 let createFoodForm = document.forms.namedItem("create-food");
 let createFoodStatus = createFoodForm.querySelector("span");
 
-function getFoodFromForm(form) {
-  let formData = new FormData(createFoodForm);
-  let food = Object.fromEntries(formData.entries());
-
-  food.calories = parseInt(food.calories);
-  food.servingSize = parseInt(food.servingSize);
-
-  if (isNaN(food.calories) || isNaN(food.servingSize)) {
-    return false;
-  }
-
-  return food;
-}
-
 createFoodForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  let food = getFoodFromForm(createFoodForm);
+  let formData = new FormData(createFoodForm);
+  let food = Object.fromEntries(formData.entries());
 
-  if (food === false) {
-    setTextTimeout(createFoodStatus,
-      "Failed to create food.", 2000);
-    console.error("Failed to get food from form.");
+  let createFoodPromise = createFood({
+    databaseConnection: databaseConnection, food: food
+  });
 
-    return;
-  }
-
-  let createFoodPromise = createFood(databaseConnection, food);
   createFoodPromise.then(() => {
     setTextTimeout(createFoodStatus,
       "Food created.", 2000);

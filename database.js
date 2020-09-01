@@ -1,30 +1,43 @@
 const DATABASE_NAME = "Calorie Tracker";
 const FOOD_SCHEMA = [ "name", "servingSize", "unit", "calories" ];
 
-function rejectOnRequestOrTransactionError({
-  reject,
-  request,
-  transaction
-}) {
+function rejectOnRequestOrTransactionError({ reject, request, transaction }) {
   request.onerror = () => { reject(request.error); };
   transaction.onerror = () => { reject(transaction.error); };
 }
 
-function resolveOnRequestAndTransactionFulfilled({
-  resolve,
-  request,
-  transaction
-}) {
+function resolveOnRequestAndTransactionFulfilled({ resolve, request, transaction }) {
   request.onsuccess = () => {
     transaction.oncomplete = () => {
-      resolve();
+      resolve(request.result);
     };
   };
 }
 
-function createFood(databaseConnection, food) {
-  if (!arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA)) {
-    return Promise.reject(Error("food keys don't match schema"));
+function convertPropertyToNumber({ object, property }) {
+  let value = object[property];
+  if (typeof value === "number") return true;
+
+  let number = Number(value);
+  if (isNaN(number)) return false;
+
+  object[property] = number;
+  return true;
+}
+
+function validFoodObject(food) {
+  if (!arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA) ||
+      !convertPropertyToNumber({ object: food, property: "servingSize" }) ||
+      !convertPropertyToNumber({ object: food, property: "calories" })) {
+    return false;
+  }
+
+  return true;
+}
+
+function createFood({ databaseConnection, food }) {
+  if (!validFoodObject(food)) {
+    return Promise.reject(Error("invalid food object"));
   }
 
   return new Promise((resolve, reject) => {
@@ -40,7 +53,25 @@ function createFood(databaseConnection, food) {
   });
 }
 
-function deleteFood(databaseConnection, key) {
+function editFood({ databaseConnection, key, food }) {
+  if (!validFoodObject(food)) {
+    return Promise.reject(Error("invalid food object"));
+  }
+
+  return new Promise((resolve, reject) => {
+    let transaction = databaseConnection.transaction(
+      ["food"], "readwrite");
+    let request = transaction.objectStore("food").put(food, key);
+
+    rejectOnRequestOrTransactionError({reject: reject,
+      transaction: transaction, request: request });
+
+    resolveOnRequestAndTransactionFulfilled({resolve: resolve,
+      request: request, transaction: transaction });
+  });
+}
+
+function deleteFood({ databaseConnection, key }) {
   return new Promise((resolve, reject) => {
     let transaction = databaseConnection.transaction(
       ["food"], "readwrite");
@@ -53,6 +84,45 @@ function deleteFood(databaseConnection, key) {
       request: request, transaction: transaction });
   });
 }
+
+function queryFood({ databaseConnection, query }) {
+  return new Promise((resolve, reject) => {
+    let transaction = databaseConnection.transaction(
+      ["food"], "readonly");
+    let index = transaction.objectStore("food").index("name");
+    let request = index.openCursor(query);
+
+    rejectOnRequestOrTransactionError({reject: reject,
+      transaction: transaction, request: request });
+
+    let array = [];
+
+    request.onsuccess = () => {
+      let cursor = request.result;
+      if (cursor) {
+        array.push({
+          primaryKey: cursor.primaryKey,
+          value: cursor.value
+        });
+
+        cursor.continue();
+      } else {
+        transaction.oncomplete = () => { resolve(array); };
+      }
+    };
+  });
+}
+
+function turnCursorToArray(cursor) {
+  let array = [];
+
+  while (cursor) {
+    array.push(cursor);
+    console.log(cursor);
+    cursor.continue();
+  }
+}
+
 
 function displayAllFoods(databaseConnection, table) {
   let tableBody = table.querySelector("tbody");
@@ -93,6 +163,7 @@ function displayAllFoods(databaseConnection, table) {
     }
   };
 }
+
 
 function initializeDatabase() {
   return new Promise((resolve, reject) => {
