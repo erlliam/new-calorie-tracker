@@ -85,6 +85,8 @@ function deleteFood({ databaseConnection, key }) {
   });
 }
 
+// XXX should I use a cursor here?
+// perhaps we are better off doing two requests?
 function queryFood({ databaseConnection, query }) {
   return new Promise((resolve, reject) => {
     let transaction = databaseConnection.transaction(
@@ -113,14 +115,34 @@ function queryFood({ databaseConnection, query }) {
   });
 }
 
-function turnCursorToArray(cursor) {
-  let array = [];
+function getFoodsInRange({ databaseConnection, startingKey, count }) {
+  return new Promise((resolve, reject) => {
+    let transaction = databaseConnection.transaction(
+      ["food"], "readonly");
+    let request = transaction.objectStore("food").openCursor(
+      IDBKeyRange.lowerBound(startingKey));
 
-  while (cursor) {
-    array.push(cursor);
-    console.log(cursor);
-    cursor.continue();
-  }
+    rejectOnRequestOrTransactionError({reject: reject,
+      transaction: transaction, request: request });
+
+    let array = [];
+    let index = 0;
+
+    request.onsuccess = () => {
+      let cursor = request.result;
+      if (cursor && index < count) {
+        index += 1;
+        array.push({
+          primaryKey: cursor.primaryKey,
+          value: cursor.value
+        });
+
+        cursor.continue();
+      } else {
+        transaction.oncomplete = () => { resolve(array); };
+      }
+    };
+  });
 }
 
 

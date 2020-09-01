@@ -4,18 +4,9 @@ let databaseConnection;
     databaseConnection = await initializeDatabase();
     console.log("Database initialized.");
 
-    let savedFoodsTable = document.getElementById("saved-foods");
-    let savedFoodsBody = savedFoodsTable.querySelector("tbody");
-
-    displayAllFoods(databaseConnection, savedFoodsTable);
-
-    // XXX No case insensitive search...
-    // XXX perhaps reject on no results found?
-    let searchResults = await queryFood({
-      databaseConnection: databaseConnection,
-      query: "Potato"
-    });
-    
+    // let savedFoodsTable = document.getElementById("saved-foods");
+    // let savedFoodsBody = savedFoodsTable.querySelector("tbody");
+    // displayAllFoods(databaseConnection, savedFoodsTable);
   } catch(error) {
     console.error(error);
   }

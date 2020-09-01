@@ -7,29 +7,34 @@
 </head>
 <body>
   <h1>Calorie Tracker</h1>
-  <div>
+
+  <form>
+    <h2>Search for food</h2>
+
+    <input name="query" required type="text">
+    <input type="submit" value="Search">
+  </form>
+
+  <form hidden id="create-food">
     <h2>Create food</h2>
 
-    <form id="create-food">
-      <div>
-        <label>Food name</label><input name="name" required type="text">
-      </div>
-      <div>
-        <label>Serving size</label><input name="servingSize" required type="number" min="0">
-      </div>
-      <div>
-        <label>Unit (optional)</label><input name="unit" type="text" value="g">
-      </div>
-      <div>
-        <label>Calories</label><input name="calories" required type="number" min="0">
-      </div>
+    <div>
+      <label>Food name</label><input name="name" required type="text">
+    </div>
+    <div>
+      <label>Serving size</label><input name="servingSize" required type="number" min="0">
+    </div>
+    <div>
+      <label>Unit (optional)</label><input name="unit" type="text" value="g">
+    </div>
+    <div>
+      <label>Calories</label><input name="calories" required type="number" min="0">
+    </div>
 
-      <input type="submit" value="Create food">
-      <span></span>
-    </form>
-  </div>
-
-
+    <input type="submit" value="Create food">
+    <span></span>
+  </form>
+<!--
   <table id="saved-foods">
 
     <caption>Saved foods</caption>
@@ -61,7 +66,7 @@
     </tbody>
 
   </table>
-
+-->
   <script src="helpers.js"></script>
   <script src="database.js"></script>
   <script src="main.js"></script>
