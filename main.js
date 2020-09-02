@@ -12,6 +12,20 @@ let databaseConnection;
   }
 })();
 
+let searchFoodForm = document.forms.namedItem("search-food");
+
+searchFoodForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  let formData = new FormData(searchFoodForm);
+  let values = Object.fromEntries(formData.entries());
+
+  let queryPromise = queryFood({ databaseConnection: databaseConnection, query: values.query });
+  queryPromise.then((result) => {
+    console.log(result);
+  });
+});
+
 let createFoodForm = document.forms.namedItem("create-food");
 let createFoodStatus = createFoodForm.querySelector("span");
 

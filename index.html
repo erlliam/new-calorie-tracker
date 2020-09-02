@@ -2,38 +2,94 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width">
   <title>Calorie Tracker</title>
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Calorie Tracker</h1>
+  <header>
+    <h1>Calorie Tracker</h1>
+    <nav>
+      <a href="index.html">Home</a
+      ><a href="index.html">Create food</a>
+    </nav>
+  </header>
 
-  <form>
-    <h2>Search for food</h2>
+  <div class="overview div-with-h2-div">
+    <h2>Overview</h2>
+    <div>
+      <div>
+        <h3>Calorie goal</h3>
+        <h4>(Not set)</h4>
+      </div>
+      <div>
+        <h3>Calories consumed</h3>
+        <h4>0</h4>
+      </div>
+      <div>
+        <h3>Calories remaining</h3>
+        <h4>(N/A)</h4>
+      </div>
+    </div>
+  </div>
 
-    <input name="query" required type="text">
-    <input type="submit" value="Search">
-  </form>
+  <div class="diary div-with-h2-div">
+    <h2>Diary - 9/1/20</h2>
+    <div>
+      <div>
+        <h3>Potato</h3>
+        <h4>100 g</h4>
+        <h4>200 calories</h4>
+      </div>
+      <div>
+        <h3>Lentils</h3>
+        <h4>681 g</h4>
+        <h4>100 calories</h4>
+      </div>
+      <div>
+        <h3>Potato</h3>
+        <h4>1 g</h4>
+        <h4>13122145 calories</h4>
+      </div>
+      <div>
+        <h3>Peanuts</h3>
+        <h4>111233121233123 g</h4>
+        <h4>13122145 calories</h4>
+      </div>
+      <div>
+        <h3>Rice</h3>
+        <h4>1241562312 g</h4>
+        <h4>1291284941241212312 calories</h4>
+      </div>
+      <button>Add food</button>
+    </div>
+  </div>
 
   <form hidden id="create-food">
     <h2>Create food</h2>
+    <div>
+      <label>Food name</label>
+      <input name="name" required type="text">
 
-    <div>
-      <label>Food name</label><input name="name" required type="text">
-    </div>
-    <div>
-      <label>Serving size</label><input name="servingSize" required type="number" min="0">
-    </div>
-    <div>
-      <label>Unit (optional)</label><input name="unit" type="text" value="g">
-    </div>
-    <div>
-      <label>Calories</label><input name="calories" required type="number" min="0">
-    </div>
+      <label>Serving size</label>
+      <input name="servingSize" required type="number" min="0">
+      <label>Unit (optional)</label>
+      <input name="unit" type="text" value="g">
+      <label>Calories</label>
+      <input name="calories" required type="number" min="0">
 
-    <input type="submit" value="Create food">
-    <span></span>
+      <input type="submit" value="Create food">
+      <span></span>
+    </div>
   </form>
+
+  <form hidden id="search-food">
+    <h2>Search for food</h2>
+
+    <input name="query" autofocus required type="text">
+    <input type="submit" value="Search">
+  </form>
+
 <!--
   <table id="saved-foods">
 
