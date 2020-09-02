@@ -60,6 +60,7 @@ label {
 .diary > div > div {
   margin-bottom: 8px;
   cursor: pointer;
+  border: 1px solid;
 }
 
 .diary > div > div > h3 {
