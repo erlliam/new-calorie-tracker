@@ -8,133 +8,129 @@
 </head>
 <body>
   <header>
-    <h1>Calorie Tracker</h1>
+    <h1>September 1, 2020</h1>
+
     <nav>
-      <a href="index.html">Diary</a
-      ><a href="index.html">Food</a>
+      <button>Back</button>
+      <button>Forth</button>
+      <button>Calender</button>
     </nav>
   </header>
 
-  <h1>September 1, 2020</h1>
+  <main>
+    <article>
+      <h2>Overview</h2>
 
-  <div class="overview div-with-h2-div">
-    <h2>Overview</h2>
-    <div>
-      <div>
-        <h3>Calorie goal</h3>
-        <h4>(Not set)</h4>
-      </div>
-      <div>
-        <h3>Calories consumed</h3>
-        <h4>0</h4>
-      </div>
-      <div>
-        <h3>Calories remaining</h3>
-        <h4>(N/A)</h4>
-      </div>
-    </div>
-  </div>
+      <button>Set calorie goal</button>
 
-  <div class="diary div-with-h2-div">
-    <h2>Diary - 9/1/20</h2>
-    <div>
-      <div>
-        <h3>Potato</h3>
-        <h4>100 g</h4>
-        <h4>200 calories</h4>
-      </div>
-      <div>
-        <h3>Lentils</h3>
-        <h4>681 g</h4>
-        <h4>100 calories</h4>
-      </div>
-      <div>
-        <h3>Potato</h3>
-        <h4>1 g</h4>
-        <h4>13122145 calories</h4>
-      </div>
-      <div>
-        <h3>Peanuts</h3>
-        <h4>111233121233123 g</h4>
-        <h4>13122145 calories</h4>
-      </div>
-      <div>
-        <h3>Rice</h3>
-        <h4>1241562312 g</h4>
-        <h4>1291284941241212312 calories</h4>
-      </div>
-      <div>
-        <h3>Rice</h3>
-        <h4>1241562312 g</h4>
-        <h4>1291284941241212312 calories</h4>
-      </div>
-      <div>
-        <h3>Rice</h3>
-        <h4>1241562312 g</h4>
-        <h4>1291284941241212312 calories</h4>
-      </div>
-      <button>Add food</button>
-    </div>
-  </div>
+      <dl>
+        <dt>Calorie goal</dt>
+        <dd>0 calories</dd>
 
-  <form hidden id="create-food">
-    <h2>Create food</h2>
-    <div>
-      <label>Food name</label>
-      <input name="name" required type="text">
+        <dt>Calories consumed</dt>
+        <dd>0 calories</dd>
 
-      <label>Serving size</label>
-      <input name="servingSize" required type="number" min="0">
-      <label>Unit (optional)</label>
-      <input name="unit" type="text" value="g">
-      <label>Calories</label>
-      <input name="calories" required type="number" min="0">
+        <dt>Calories remaining</dt>
+        <dd>(N/A)</dd>
+      </dl>
+    </article>
 
-      <input type="submit" value="Create food">
-      <span></span>
-    </div>
-  </form>
+    <article>
+      <h2>Diary</h2>
 
-  <form hidden id="search-food">
-    <h2>Search for food</h2>
+      <table>
+        <caption>200 calories total</caption>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Serving Size</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Potato</td>
+            <td>100 g</td>
+            <td>200 calories</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
 
-    <input name="query" autofocus required type="text">
-    <input type="submit" value="Search">
-  </form>
+    <article>
+      <h2>Add to diary</h2>
 
-<!--
-  <table id="saved-foods">
+      <button>Recent foods</button>
+      <button>Search for food</button>
+      <button>Create food</button>
+      <button>Calories</button>
 
-    <caption>Saved foods</caption>
+      <section>
+        <h3>Recent foods</h3>
 
-    <thead>
-      <tr>
-        <th>Food name</th>
-        <th>Serving size</th>
-        <th>Calories</th>
-        <th></th>
-      </tr>
-    </thead>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Serving Size</th>
+              <th>Calories</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
 
-    <tbody>
-      <tr hidden>
-        <td colspan="4">No created foods</td>
-      </tr>
+      <section>
+        <h3>Search for food</h3>
 
-      <tr hidden data-id="10">
-        <td>Apple</td>
-        <td>100 g</td>
-        <td>52</td>
-        <td>
-          <button>Add to diary</button>
-          <button>Edit</button>
-          <button>Delete</button>
-        </td>
-      </tr>
-    </tbody>
+        <form id="search-food">
+          <input name="query" required type="text">
+          <input type="submit" value="Search">
+        </form>
+      </section>
 
-  </table>
--->
+      <section>
+        <h3>Create food</h3>
+
+        <form id="create-food">
+          <label>Food name</label>
+          <input name="name" required type="text">
+
+          <label>Serving size</label>
+          <input name="servingSize" required type="number" min="0">
+
+          <label>Unit (optional)</label>
+          <input name="unit" type="text" value="g">
+
+          <label>Calories</label>
+          <input name="calories" required type="number" min="0">
+
+          <input type="submit" value="Create food">
+          <span></span>
+        </form>
+      </section>
+
+      <section>
+        <h3>Calories</h3>
+
+        <form>
+          <label>Note</label>
+          <input type="text">
+
+          <label>Calories</label>
+          <input type="text">
+        </form>
+      </section>
+    </article>
+
+  </main>
+
   <script src="js/helpers.js"></script>
   <script src="js/database.js"></script>
   <script src="js/main.js"></script>
