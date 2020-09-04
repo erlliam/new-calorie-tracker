@@ -1,24 +1,16 @@
+/* CLASSES */
 .hidden {
   display: none;
 }
+/* CLASSES */
 
 body {
   margin: 0;
-}
-
-header,
-main {
-  max-width: 40rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-left: auto;
-  margin-right: auto;
-
+  font-family: "Arial";
 }
 
 /* HEADER */
 header {
-  background-color: red;
   text-align: center;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
@@ -31,21 +23,26 @@ header > h1 {
   font-weight: 100;
 }
 
-header > nav {
-  white-space: nowrap;
-}
-
 header > nav > button {
   padding: .3rem 1rem;
   border: 0;
-  background-color: blue;
   border-radius: 8px;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 100;
+  background-color: #ffaaaa;
+  color: #550000;
 }
 /* HEADER */
 
 /* MAIN */
+main {
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 main > article {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
@@ -54,12 +51,35 @@ main > article {
 main > article > h2 {
   margin-top: 0;
   margin-bottom: 0.5rem;
+  font-size: 1.7rem;
   font-weight: 100;
-  letter-spacing: 0.1rem;
+  font-family: sans-serif;
+  border-bottom: 1px solid;
 }
 /* MAIN */
 
-/* TABLE */
+button {
+  padding: .3rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  line-height: 1.5;
+  font-size: 1.5rem;
+  font-weight: 100;
+  background-color: #ffaaaa;
+  color: #550000;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #d46a6a;
+}
+button:active {
+  background-color: #aa3939;
+}
+button:focus {
+  outline: 1px solid;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -73,4 +93,11 @@ td, th {
   border: 1px solid;
   padding: 1rem;
 }
-/* TABLE */
+
+#open-buttons {
+  text-align: center;
+}
+
+#open-buttons button {
+  margin: .5rem .5rem;
+}
