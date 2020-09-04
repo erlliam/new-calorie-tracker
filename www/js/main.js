@@ -1,3 +1,59 @@
+let previousDayButton = document.getElementById("set-calorie-goal");
+let nextDayButton = document.getElementById("set-calorie-goal");
+
+let openCalorieGoalButton = document.getElementById("open-calorie-goal");
+
+let openRecentFoodsButton = document.getElementById("open-recent-foods");
+let recentFoodsSection = document.getElementById("recent-foods");
+
+let openFoodSearchButton = document.getElementById("open-food-search");
+let foodSearchSection = document.getElementById("food-search");
+
+let openCreateFoodButton = document.getElementById("open-create-food");
+let createFoodSection = document.getElementById("create-food");
+
+let openAddCaloriesButton = document.getElementById("open-add-calories");
+let addCaloriesSection = document.getElementById("add-calories");
+
+let currentlyOpen;
+
+function buttonTogglesElement({ button, element }) {
+  button.onclick = () => {
+    if (currentlyOpen) {
+      if (currentlyOpen === element) {
+        element.classList.toggle("hidden");
+        currentlyOpen = null;
+      } else {
+        currentlyOpen.classList.toggle("hidden");
+        element.classList.toggle("hidden");
+        currentlyOpen = element;
+      }
+    } else {
+      element.classList.toggle("hidden");
+      currentlyOpen = element;
+    }
+  };
+}
+
+buttonTogglesElement({
+  button: openRecentFoodsButton,
+  element: recentFoodsSection
+});
+
+buttonTogglesElement({
+  button: openFoodSearchButton,
+  element: foodSearchSection
+});
+
+buttonTogglesElement({
+  button: openCreateFoodButton,
+  element: createFoodSection
+});
+buttonTogglesElement({
+  button: openAddCaloriesButton,
+  element: addCaloriesSection
+});
+
 let databaseConnection;
 (async () => {
   try {

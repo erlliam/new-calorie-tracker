@@ -8,20 +8,17 @@
 </head>
 <body>
   <header>
-    <h1>September 1, 2020</h1>
+    <h1>September 31, 2020</h1>
 
     <nav>
-      <button>Back</button>
-      <button>Forth</button>
-      <button>Calender</button>
+      <button>&lt;</button>
+      <button>&gt;</button>
     </nav>
   </header>
 
   <main>
     <article>
       <h2>Overview</h2>
-
-      <button>Set calorie goal</button>
 
       <dl>
         <dt>Calorie goal</dt>
@@ -33,13 +30,14 @@
         <dt>Calories remaining</dt>
         <dd>(N/A)</dd>
       </dl>
+
+      <button id="open-calorie-goal">Set calorie goal</button>
     </article>
 
     <article>
       <h2>Diary</h2>
 
       <table>
-        <caption>200 calories total</caption>
         <thead>
           <tr>
             <th>Name</th>
@@ -53,6 +51,11 @@
             <td>100 g</td>
             <td>200 calories</td>
           </tr>
+          <tr>
+            <td>Lentils</td>
+            <td>40 g</td>
+            <td>34 calories</td>
+          </tr>
         </tbody>
       </table>
     </article>
@@ -60,12 +63,12 @@
     <article>
       <h2>Add to diary</h2>
 
-      <button>Recent foods</button>
-      <button>Search for food</button>
-      <button>Create food</button>
-      <button>Calories</button>
+      <button id="open-recent-foods">Recent foods</button>
+      <button id="open-food-search">Search for food</button>
+      <button id="open-create-food">Create food</button>
+      <button id="open-add-calories">Add calories</button>
 
-      <section>
+      <section id="recent-foods"class="hidden">
         <h3>Recent foods</h3>
 
         <table>
@@ -86,7 +89,7 @@
         </table>
       </section>
 
-      <section>
+      <section id="food-search"class="hidden">
         <h3>Search for food</h3>
 
         <form id="search-food">
@@ -95,7 +98,7 @@
         </form>
       </section>
 
-      <section>
+      <section id="create-food" class="hidden">
         <h3>Create food</h3>
 
         <form id="create-food">
@@ -116,7 +119,7 @@
         </form>
       </section>
 
-      <section>
+      <section id="add-calories" class="hidden">
         <h3>Calories</h3>
 
         <form>
