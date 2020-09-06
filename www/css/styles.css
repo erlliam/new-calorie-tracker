@@ -9,7 +9,9 @@ body {
   font-family: "Arial";
 }
 
-dl {
+ul {
+  list-style: none;
+  padding-left: 0;
   margin-top: 0;
   margin-bottom: 1rem;
   margin-left: 1rem;
@@ -22,26 +24,37 @@ input[type="submit"] {
   cursor: pointer;
   padding: .7rem 1rem;
   border: 1px solid #bbbbbb;
-  border-radius: 8px;
+  background-color: #f4f4f4;
+}
+
+button:hover,
+input[type="submit"]:hover {
+  background-color: #dddddd;
+}
+
+#set-calorie-goal {
+  text-align: center;
+  margin-left: 0;
+}
+
+#set-calorie-goal > input:first-child {
+  border-right: 0;
 }
 
 table {
   width: 100%;
   font-size: 1.3rem;
   border-collapse: collapse;
-}
-
-td, th {
   border: 1px solid;
 }
 
 td {
   height: 50px;
-  padding: 0 1rem;
   text-align: center;
 }
 
 .food {
+  border: 1px solid;
   cursor: pointer;
   background-color: #dddddd;
 }
@@ -56,9 +69,9 @@ label {
 }
 
 input {
+  font-size: 1rem;
   padding: .7rem 1rem;
   border: 1px solid #bbbbbb;
-  border-radius: 8px;
 }
 
 .label-input {
@@ -71,6 +84,8 @@ header {
   text-align: center;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
+  background-color: #93dddd;
+  border-bottom: 2px solid #bbbbbb;
 }
 
 header > h1 {
@@ -114,4 +129,5 @@ section h3 {
 
 #open-buttons button {
   margin: .5rem .5rem;
+  width: 160px;
 }

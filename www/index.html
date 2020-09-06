@@ -19,19 +19,16 @@
   <main>
     <article>
       <h2>Overview</h2>
+      <ul>
+        <li>Calorie goal: <span id="calorie-goal">(not set)</span</li>
+        <li>Calories consumed: <span id="calories-consumed">0</span></li>
+        <li>Calories remaining: <span id="calories-remaining">N/A</span></li>
+      </ul>
 
-      <dl>
-        <dt>Calorie goal</dt>
-        <dd>0 calories</dd>
-
-        <dt>Calories consumed</dt>
-        <dd>0 calories</dd>
-
-        <dt>Calories remaining</dt>
-        <dd>(N/A)</dd>
-      </dl>
-
-      <button id="open-calorie-goal">Set calorie goal</button>
+      <form id="set-calorie-goal">
+        <input name="calorieGoal" required size="3" type="number" min="0"
+        ><input type="submit" value="Set calorie goal">
+      </form>
     </article>
 
     <article>
@@ -139,7 +136,7 @@
         <form>
           <div class="label-input">
             <label>Calories</label>
-            <input type="text">
+            <input required type="text">
           </div>
           <div class="label-input">
             <label>Note - <em>optional</em></label>
