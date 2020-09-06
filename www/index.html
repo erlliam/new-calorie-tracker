@@ -70,7 +70,7 @@
         ><button id="open-add-calories">Add calories</button>
       </nav>
 
-      <section id="recent-foods"class="hidden">
+      <section id="recent-foods" class="hidden">
         <h3>Recent foods</h3>
 
         <table>
@@ -91,11 +91,14 @@
         </table>
       </section>
 
-      <section id="food-search"class="hidden">
+      <section id="food-search" class="hidden">
         <h3>Search for food</h3>
 
         <form id="search-food">
-          <input name="query" required type="text">
+          <div class="label-input">
+            <label>Food name</label>
+            <input name="query" required type="text">
+          </div>
           <input type="submit" value="Search">
         </form>
       </section>
@@ -104,20 +107,24 @@
         <h3>Create food</h3>
 
         <form id="create-food">
-          <label>Food name</label>
-          <input name="name" required type="text">
-
-          <label>Serving size</label>
-          <input name="servingSize" required type="number" min="0">
-
-          <label>Unit (optional)</label>
-          <input name="unit" type="text" value="g">
-
-          <label>Calories</label>
-          <input name="calories" required type="number" min="0">
+          <div class="label-input">
+            <label>Food name</label>
+            <input name="name" required type="text">
+          </div>
+          <div class="label-input">
+            <label>Serving size</label>
+            <input name="servingSize" required type="number" min="0">
+          </div>
+          <div class="label-input">
+            <label>Unit - <em>optional</em></label>
+            <input name="unit" type="text" value="g">
+          </div>
+          <div class="label-input">
+            <label>Calories</label>
+            <input name="calories" required type="number" min="0">
+          </div>
 
           <input type="submit" value="Create food">
-          <span></span>
         </form>
       </section>
 
@@ -125,11 +132,15 @@
         <h3>Calories</h3>
 
         <form>
-          <label>Note</label>
-          <input type="text">
-
-          <label>Calories</label>
-          <input type="text">
+          <div class="label-input">
+            <label>Calories</label>
+            <input type="text">
+          </div>
+          <div class="label-input">
+            <label>Note - <em>optional</em></label>
+            <input type="text">
+          </div>
+          <input type="submit" value="Add calories">
         </form>
       </section>
     </article>
