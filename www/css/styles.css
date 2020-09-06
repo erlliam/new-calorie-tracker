@@ -42,7 +42,11 @@ th {
 td {
   text-align: center;
   padding: .7rem 1rem;
+}
+
+.food {
   cursor: pointer;
+  background-color: #dddddd;
 }
 
 form {
