@@ -44,74 +44,88 @@ class HeaderDate {
   }
 }
 
+class AddToDiaryButtons {
+  constructor({ cssClass, elementButtonArray }) {
+    this._currentlyToggled = null;
+    this._cssClass = cssClass
+
+    for (let elementButton of elementButtonArray) {
+      elementButton.button.onclick = () => {
+        this._onclick({
+          element: elementButton.element,
+          button: elementButton.button
+        });
+      };
+    }
+  }
+
+  _open(element) {
+    element.classList.toggle(this._cssClass);
+    this._currentlyToggled = element;
+  }
+
+  _close() {
+    this._currentlyToggled.classList.toggle(this._cssClass);
+    this._currentlyToggled = null;
+    
+  };
+
+  _onclick({ button, element }) {
+    if (this._currentlyToggled === null) {
+      this._open(element);
+    } else {
+      if (this._currentlyToggled === element) {
+        this._close()
+      } else {
+        this._close();
+        this._open(element);
+      }
+    }
+  }
+}
+
 (() => {
   let date = new Date();
 
-  let headerDate = new HeaderDate({
+  new HeaderDate({
     date: date,
     textElement: document.getElementById("diary-date"),
     backButton: document.getElementById("diary-date-back"),
     forwardButton: document.getElementById("diary-date-forward")
   });
 
-  let setCalorieGoalForm = document.getElementById("set-calorie-goal");
   handleSubmitEvent({
-    form: setCalorieGoalForm,
+    form: document.getElementById("set-calorie-goal"),
     callback: (values) => {
       let calorieGoal = values.calorieGoal;
       // XXX
       console.log("IMPLEMENT ME");
-      // set calorieGoal for the diary.
-      // calculate calories remaining
     }
   });
-})();
 
-
-/*
-let currentlyOpen;
-
-function buttonTogglesElement({ button, element }) {
-  button.onclick = () => {
-    if (currentlyOpen) {
-      if (currentlyOpen === element) {
-        element.classList.toggle("hidden");
-        currentlyOpen = null;
-      } else {
-        currentlyOpen.classList.toggle("hidden");
-        element.classList.toggle("hidden");
-        currentlyOpen = element;
+  new AddToDiaryButtons({
+    cssClass: "hidden",
+    elementButtonArray: [
+      {
+        element: document.getElementById("recent-foods"),
+        button: document.getElementById("open-recent-foods"),
+      },
+      {
+        element: document.getElementById("food-search"),
+        button: document.getElementById("open-food-search"),
+      },
+      {
+        element: document.getElementById("create-food"),
+        button: document.getElementById("open-create-food"),
+      },
+      {
+        element: document.getElementById("add-calories"),
+        button: document.getElementById("open-add-calories"),
       }
-    } else {
-      element.classList.toggle("hidden");
-      currentlyOpen = element;
-    }
-  };
-}
-
-let previousDayButton = document.getElementById("set-calorie-goal");
-let nextDayButton = document.getElementById("set-calorie-goal");
-
-let openCalorieGoalButton = document.getElementById("open-calorie-goal");
-
-let openRecentFoodsButton = document.getElementById("open-recent-foods");
-let recentFoodsSection = document.getElementById("recent-foods");
-
-let openFoodSearchButton = document.getElementById("open-food-search");
-let foodSearchSection = document.getElementById("food-search");
-
-let openCreateFoodButton = document.getElementById("open-create-food");
-let createFoodSection = document.getElementById("create-food");
-
-let openAddCaloriesButton = document.getElementById("open-add-calories");
-let addCaloriesSection = document.getElementById("add-calories");
-
-buttonTogglesElement({ button: openRecentFoodsButton, element: recentFoodsSection });
-buttonTogglesElement({ button: openFoodSearchButton, element: foodSearchSection });
-buttonTogglesElement({ button: openCreateFoodButton, element: createFoodSection });
-buttonTogglesElement({ button: openAddCaloriesButton, element: addCaloriesSection });
-
-
+    ]
+  });
+})();
+/*
 let databaseConnection;
 (async () => {
   try {
