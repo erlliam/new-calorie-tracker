@@ -6,7 +6,7 @@
 
 body {
   margin: 0;
-  font-family: "Arial";
+  font-family: 'Roboto', sans-serif;
 }
 
 ul {
@@ -15,7 +15,7 @@ ul {
   margin-top: 0;
   margin-bottom: 1rem;
   margin-left: 1rem;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 
 button,
@@ -24,6 +24,7 @@ input[type="submit"] {
   cursor: pointer;
   padding: .7rem 1rem;
   border: 1px solid #bbbbbb;
+  border-radius: 8px;
   background-color: #f4f4f4;
 }
 
@@ -38,25 +39,49 @@ input[type="submit"]:hover {
 }
 
 #set-calorie-goal > input:first-child {
-  border-right: 0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+#set-calorie-goal > input:last-child {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 table {
-  width: 100%;
-  font-size: 1.3rem;
+  width: calc(100% + 2rem);
+  margin-left: -1rem;
   border-collapse: collapse;
-  border: 1px solid;
+}
+
+thead {
+  font-size: 1rem;
+  color: #555555;
+}
+
+tbody {
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+tbody > tr:nth-child(2n) {
+  background-color: #f4f4f4;
+}
+
+th {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 td {
   height: 50px;
-  text-align: center;
 }
 
 .food {
-  border: 1px solid;
   cursor: pointer;
-  background-color: #dddddd;
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
 }
 
 form {
@@ -65,7 +90,8 @@ form {
 
 label {
   display: block;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
+  color: #575757;
 }
 
 input {
@@ -82,10 +108,10 @@ input {
 /* HEADER */
 header {
   text-align: center;
-  padding-top: 1.5rem;
-  padding-bottom: 1.5rem;
-  background-color: #93dddd;
-  border-bottom: 2px solid #bbbbbb;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background-color: #fbe9b3;
+  border-bottom: 1px solid #bbbbbb;
 }
 
 header > h1 {
@@ -108,19 +134,19 @@ main > article {
 }
 
 main > article > h2 {
+  font-weight: 400;
   margin-top: 1rem;
   margin-bottom: 1rem;
   font-size: 1.7rem;
-  border-bottom: 1px solid;
 }
 
 /* MAIN */
 
 section h3 {
+  font-weight: 400;
   margin-top: 1rem;
   margin-bottom: 1rem;
   font-size: 1.5rem;
-  border-bottom: 1px solid;
 }
 
 #open-buttons {
@@ -128,6 +154,6 @@ section h3 {
 }
 
 #open-buttons button {
-  margin: .5rem .5rem;
+  margin: .25rem .25rem;
   width: 160px;
 }

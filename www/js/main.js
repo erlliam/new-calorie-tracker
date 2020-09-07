@@ -1,3 +1,74 @@
+function handleSubmitEvent({ form, callback }) {
+  if (form.tagName !== "FORM") {
+    throw TypeError("form parameter is not a form.");
+  } else if (typeof callback !== "function") {
+    throw TypeError("callback parameter is not a function.");
+  }
+
+  form.onsubmit = (event) => {
+    event.preventDefault();
+
+    let values = Object.fromEntries(new FormData(form).entries());
+    callback(values);
+  }
+}
+
+class HeaderDate {
+  constructor({ date, textElement, backButton, forwardButton }) {
+    this._date = date;
+    this._textElement = textElement;
+    this._backButton = backButton;
+    this._forwardButton = forwardButton;
+
+    this._init();
+  }
+
+  _init() {
+    this._updateText();
+    this._forwardButton.onclick = () => { this._changeDate(1); };
+    this._backButton.onclick = () => { this._changeDate(-1); };
+  }
+
+  _updateText() {
+    this._textElement.textContent = this._date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  _changeDate(amount) {
+    let time = this._date.getTime();
+    this._date.setTime(time + amount * (1000 * 60 * 60 * 24));
+    this._updateText();
+  }
+}
+
+(() => {
+  let date = new Date();
+
+  let headerDate = new HeaderDate({
+    date: date,
+    textElement: document.getElementById("diary-date"),
+    backButton: document.getElementById("diary-date-back"),
+    forwardButton: document.getElementById("diary-date-forward")
+  });
+
+  let setCalorieGoalForm = document.getElementById("set-calorie-goal");
+  handleSubmitEvent({
+    form: setCalorieGoalForm,
+    callback: (values) => {
+      let calorieGoal = values.calorieGoal;
+      // XXX
+      console.log("IMPLEMENT ME");
+      // set calorieGoal for the diary.
+      // calculate calories remaining
+    }
+  });
+})();
+
+
+/*
 let currentlyOpen;
 
 function buttonTogglesElement({ button, element }) {
@@ -94,3 +165,4 @@ createFoodForm.addEventListener("submit", (event) => {
     console.error(error);
   });
 });
+*/

@@ -208,8 +208,11 @@ function initializeDatabase() {
 function configureDatabase(databaseConnection) {
   let foodObjectStore = databaseConnection.createObjectStore(
     "food", { "autoIncrement": true });
-
   foodObjectStore.createIndex("name", "name");
+
+  // XXX LEEEEEEE
+  let diaryObjectStore = databaseConnection.createObjectStore(
+    "diary", { "autoIncrement": true });
 }
 
 function deleteDatabase() {

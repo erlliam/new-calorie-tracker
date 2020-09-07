@@ -5,14 +5,15 @@
   <meta name="viewport" content="width=device-width">
   <title>Calorie Tracker</title>
   <link href="css/styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
-    <h1>September 31, 2020</h1>
+    <h1 id="diary-date"></h1>
 
     <nav>
-      <button>&lt;</button>
-      <button>&gt;</button>
+      <button id="diary-date-back">&lt;</button>
+      <button id="diary-date-forward">&gt;</button>
     </nav>
   </header>
 
@@ -43,6 +44,9 @@
           </tr>
         </thead>
         <tbody>
+          <tr hidden class="food">
+            <td colspan="3">No entries</td>
+          </tr>
           <tr class="food">
             <td>A really long name for food</td>
             <td>100 g</td>
@@ -84,6 +88,51 @@
             </tr>
           </thead>
           <tbody>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
+            <tr class="food">
+              <td>Potato</td>
+              <td>100 g</td>
+              <td>200 calories</td>
+            </tr>
             <tr class="food">
               <td>Potato</td>
               <td>100 g</td>
@@ -131,7 +180,7 @@
       </section>
 
       <section id="add-calories" class="hidden">
-        <h3>Calories</h3>
+        <h3>Add calories</h3>
 
         <form>
           <div class="label-input">
