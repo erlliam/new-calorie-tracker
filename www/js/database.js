@@ -4,7 +4,7 @@ const FOOD_SCHEMA = [ "name", "servingSize", "unit", "calories" ];
 class Database {
   constructor({ name, version }) {
     this.ready = this._openDatabase({ name: name, version: version });
-    // this.food = new DatabaseFood(this._connection);
+    this.food = new DatabaseFood(this);
     // this.diary = new DatabaseDiary(this._connection);
   }
 
@@ -43,7 +43,7 @@ class Database {
       "diary", { "autoIncrement": true });
   }
 
-  _transact({ storeNames, mode, callback }) {
+  transact({ storeNames, mode, callback }) {
     return new Promise((resolve, reject) => {
       let transaction = this._connection.transaction(
         storeNames, mode);
@@ -64,33 +64,39 @@ class Database {
       callback(stores);
     });
   }
+}
 
-  async createFood(food) {
+class DatabaseFood {
+  constructor(database) {
+    this._database = database;
+  }
+
+  async create(food) {
     if (!validFoodObject(food)) {
       return Promise.reject(Error("invalid food object"));
     }
 
-    await this._transact({
+    await this._database.transact({
       storeNames: ["food"], mode: "readwrite", callback: (stores) => {
         stores.food.add(food);
       }
     });
   }
 
-  async editFood({ key, newFood }) {
+  async edit({ key, newFood }) {
     if (!validFoodObject(newFood)) {
       return Promise.reject(Error("invalid food object"));
     }
 
-    await this._transact({
+    await this._database.transact({
       storeNames: ["food"], mode: "readwrite", callback: (stores) => {
         stores.food.put(newFood, key);
       }
     });
   }
 
-  async deleteFood(key) {
-    await this._transact({
+  async remove(key) {
+    await this._database.transact({
       storeNames: ["food"], mode: "readwrite", callback: (stores) => {
         stores.food.delete(key);
       }
@@ -104,8 +110,8 @@ class Database {
 
   let food = { name: "create test", servingSize: 1, unit: "g", calories: 1 };
   
-  await database.createFood(food);
-  await database.editFood({ key: 1, newFood: {
+  await database.food.create(food);
+  await database.food.edit({ key: 1, newFood: {
     name: "edit test",
     servingSize: 1,
     unit: "g",
@@ -113,8 +119,8 @@ class Database {
   }});
 
   let promiseArray = [];
-  for (let i = 0; i <= 9; i++) {
-    promiseArray.push(database.deleteFood(i));
+  for (let i = 0; i <= 19; i++) {
+    promiseArray.push(database.food.remove(i));
   }
 
   await Promise.all(promiseArray);
