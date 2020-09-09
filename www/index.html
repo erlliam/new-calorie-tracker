@@ -20,20 +20,72 @@
   <main>
     <article>
       <h2>Overview</h2>
-      <ul>
-        <li>Calorie goal: <span id="calorie-goal">(not set)</span</li>
-        <li>Calories consumed: <span id="calories-consumed">0</span></li>
-        <li>Calories remaining: <span id="calories-remaining">N/A</span></li>
-      </ul>
 
-      <form id="set-calorie-goal">
-        <input name="calorieGoal" required size="3" type="number" min="0"
-        ><input type="submit" value="Set calorie goal">
-      </form>
+      <table class="overview-table">
+        <thead>
+          <tr>
+            <th>Goal</th>
+            <th>Consumed</th>
+            <th>Remaining</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="calorie-goal" class="hidden">2000</td>
+            <td id="calorie-goal-active" class="hidden">
+              <form id="set-calorie-goal">
+                <input type="number" min="0"
+                ><input type="submit" value="->">
+              </form>
+            </td>
+            <td>1200</td>
+            <td>800</td>
+          </tr>
+        </tbody>
+      </table>
     </article>
 
     <article>
       <h2>Diary</h2>
+
+      <table class="food-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Serving Size</th>
+            <th>Calories</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr class="food">
+            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
+            <td>Ius an mutat scripta insolens. Duo probo dolor delenit et. Maiestatis incorrupte scribentur an vix, ex delenit expetenda nam, usu cu illum utamur perpetua. An usu ludus vocent, in sea iuvaret blandit.</td>
+            <td>200 calories</td>
+          </tr>
+
+          <tr class="food">
+            <td>1</td>
+            <td>1 g</td>
+            <td>1 calories</td>
+          </tr>
+
+          <tr class="food">
+            <td colspan="3">+ Add to diary</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+
+    <nav id="open-buttons">
+      <button id="open-recent-foods">Recent foods</button
+      ><button id="open-food-search">Search for food</button
+      ><button id="open-create-food">Create food</button
+      ><button id="open-add-calories">Add calories</button>
+    </nav>
+
+    <section id="recent-foods">
+      <h3>Recent foods</h3>
 
       <table>
         <thead>
@@ -44,161 +96,67 @@
           </tr>
         </thead>
         <tbody>
-          <tr hidden class="food">
-            <td colspan="3">No entries</td>
-          </tr>
-          <tr class="food">
-            <td>A really long name for food</td>
-            <td>100 g</td>
-            <td>200 calories</td>
-          </tr>
-          <tr class="food">
-            <td>Lentils</td>
-            <td>10000 cups from the north</td>
-            <td>34123 calories</td>
-          </tr>
-          <tr class="food">
-            <td>One</td>
-            <td>1 g</td>
-            <td>1 calories</td>
-          </tr>
         </tbody>
       </table>
-    </article>
+    </section>
 
-    <article>
-      <h2>Add to diary</h2>
-      
-      <nav id="open-buttons">
-        <button id="open-recent-foods">Recent foods</button
-        ><button id="open-food-search">Search for food</button
-        ><button id="open-create-food">Create food</button
-        ><button id="open-add-calories">Add calories</button>
-      </nav>
+    <section id="food-search">
+      <h3>Search for food</h3>
 
-      <section id="recent-foods" class="hidden">
-        <h3>Recent foods</h3>
+      <form id="search-food">
+        <div class="label-input">
+          <label>Food name</label>
+          <input name="query" required type="text">
+        </div>
+        <input type="submit" value="Search">
+      </form>
+    </section>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Serving Size</th>
-              <th>Calories</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-            <tr class="food">
-              <td>Potato</td>
-              <td>100 g</td>
-              <td>200 calories</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+    <section id="create-food">
+      <h3>Create food</h3>
 
-      <section id="food-search" class="hidden">
-        <h3>Search for food</h3>
+      <form id="create-food">
+        <div class="label-input">
+          <label>Food name</label>
+          <input name="name" required type="text">
+        </div>
+        <div class="label-input">
+          <label>Serving size</label>
+          <input name="servingSize" required type="number" min="0">
+        </div>
+        <div class="label-input">
+          <label>Unit - <em>optional</em></label>
+          <input name="unit" type="text" value="g">
+        </div>
+        <div class="label-input">
+          <label>Calories</label>
+          <input name="calories" required type="number" min="0">
+        </div>
 
-        <form id="search-food">
-          <div class="label-input">
-            <label>Food name</label>
-            <input name="query" required type="text">
-          </div>
-          <input type="submit" value="Search">
-        </form>
-      </section>
+        <input type="submit" value="Create food">
+      </form>
+    </section>
 
-      <section id="create-food" class="hidden">
-        <h3>Create food</h3>
+    <section id="add-calories">
+      <h3>Add calories</h3>
 
-        <form id="create-food">
-          <div class="label-input">
-            <label>Food name</label>
-            <input name="name" required type="text">
-          </div>
-          <div class="label-input">
-            <label>Serving size</label>
-            <input name="servingSize" required type="number" min="0">
-          </div>
-          <div class="label-input">
-            <label>Unit - <em>optional</em></label>
-            <input name="unit" type="text" value="g">
-          </div>
-          <div class="label-input">
-            <label>Calories</label>
-            <input name="calories" required type="number" min="0">
-          </div>
-
-          <input type="submit" value="Create food">
-        </form>
-      </section>
-
-      <section id="add-calories" class="hidden">
-        <h3>Add calories</h3>
-
-        <form>
-          <div class="label-input">
-            <label>Calories</label>
-            <input required type="text">
-          </div>
-          <div class="label-input">
-            <label>Note - <em>optional</em></label>
-            <input type="text">
-          </div>
-          <input type="submit" value="Add calories">
-        </form>
-      </section>
-    </article>
+      <form>
+        <div class="label-input">
+          <label>Calories</label>
+          <input name="calories" required type="number" min="0">
+        </div>
+        <div class="label-input">
+          <label>Note - <em>optional</em></label>
+          <input name="note" type="text">
+        </div>
+        <input type="submit" value="Add calories">
+      </form>
+    </section>
 
   </main>
 
   <script src="js/helpers.js"></script>
+  <script src="js/frontend.js"></script>
   <script src="js/database.js"></script>
   <script src="js/main.js"></script>
 </body>

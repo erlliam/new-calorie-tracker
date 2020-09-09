@@ -15,3 +15,19 @@ function arraysMatchAnyOrder(arrayOne, arrayTwo) {
 
   return true;
 }
+
+function handleSubmitEvent({ form, callback }) {
+  if (form.tagName !== "FORM") {
+    throw TypeError("form parameter is not a form.");
+  } else if (typeof callback !== "function") {
+    throw TypeError("callback parameter is not a function.");
+  }
+
+  form.onsubmit = (event) => {
+    event.preventDefault();
+
+    let values = Object.fromEntries(new FormData(form).entries());
+    callback(values);
+  }
+}
+
