@@ -1,10 +1,28 @@
-let date = new Date();
-console.log(date.toLocaleDateString());
-console.log(date.toLocaleString());
-console.log(date.toLocaleTimeString());
-
 (() => {
-  const DATABASE_NAME = "Calorie Tracker";
+  (async () => {
+    const DATABASE_NAME = "Calorie Tracker";
+
+    let database = new Database({ name: DATABASE_NAME });
+    await database.ready;
+
+    let potato = { name: "Potato", servingSize: 1, unit: "g", calories: 100 }
+    console.log("validFoodObject: " +
+      validFoodObject(potato));
+    // await database.food.create(potato);
+    // console.log("Potato created");
+    let keyToCheck = 26;
+
+    console.log(`Database key ${keyToCheck} exists: \
+${await database.food.getKey(keyToCheck)}`);
+
+    let diaryExample = {
+      dateString: "9/11/2020",
+      foodKey: 26
+    }
+
+    console.log("validDiaryEntry: " +
+      await validDiaryEntry(diaryExample, database));
+  })();
 
   let date = new Date();
   let calorieGoal = 1;
@@ -47,11 +65,6 @@ console.log(date.toLocaleTimeString());
     ]
   });
 
-  (async () => {
-    let database = new Database({ name: DATABASE_NAME });
-    await database.ready;
-
-  })();
 })();
 
 // await database.food.create(food);

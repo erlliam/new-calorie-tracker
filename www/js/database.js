@@ -115,19 +115,36 @@ class DatabaseFood {
       }
     );
   }
+
+  async getKey(key) {
+    let requestFunctions = {};
+    let requestPromise = new Promise((resolve, reject) => {
+      requestFunctions.resolve = resolve;
+      requestFunctions.reject = reject;
+    });
+
+    await this._database.transactReadOnly({ storeNames: ["food"] },
+      (stores) => {
+        let request = stores.food.getKey(key);
+
+        request.addEventListener("success", (event) => {
+          requestFunctions.resolve(request.result);
+        });
+      }
+    );
+
+    let result = await requestPromise;
+
+    return result !== undefined;
+  }
 }
 
-let diaryExample = {
-  dateString: "9/11/2020"
-  foodKey: 2
-}
-
-function validDiary(diary) {
-  if (!Date.parse(diary.dateString)) { return false };
-  // find foodKey in food objectStore
-  // prpoceed
-  // XXX
-  
+async function validDiaryEntry(diary, database) {
+  // getKey is asynchronous
+  // Date parse implies a string is provided
+  // getKey implies an int is provided
+  return !isNaN(Date.parse(diary.dateString)) &&
+    database.food.getKey(diary.foodKey);
 }
 
 class DatabaseDiary {
@@ -259,12 +276,8 @@ function convertPropertyToNumber({ object, property }) {
 const FOOD_SCHEMA = [ "name", "servingSize", "unit", "calories" ];
 
 function validFoodObject(food) {
-  if (!arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA) ||
-      !convertPropertyToNumber({ object: food, property: "servingSize" }) ||
-      !convertPropertyToNumber({ object: food, property: "calories" })) {
-    return false;
-  }
-
-  return true;
+  return arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA) &&
+    convertPropertyToNumber({ object: food, property: "servingSize" }) &&
+    convertPropertyToNumber({ object: food, property: "calories" });
 }
 
