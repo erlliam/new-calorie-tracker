@@ -34,10 +34,9 @@ class Database {
       "food", { autoIncrement: true });
     foodObjectStore.createIndex("name", "name");
 
-    // XXX
-    // Implement diary pages. Decide on the key.
     let diaryObjectStore = connection.createObjectStore(
-      "diary", { keyPath: dateString });
+      "diary", { autoIncrement: true });
+    diaryObjectStore.createIndex("date", "dateString");
   }
 
   _transact({ storeNames, mode }, callback) {
@@ -86,7 +85,7 @@ class DatabaseFood {
 
   async create(food) {
     if (!validFoodObject(food)) {
-      return Promise.reject(Error("invalid food object"));
+      throw Error("invalid food object");
     }
 
     await this._database.transactReadWrite({ storeNames: ["food"] },
@@ -98,7 +97,7 @@ class DatabaseFood {
 
   async edit({ key, newFood }) {
     if (!validFoodObject(newFood)) {
-      return Promise.reject(Error("invalid food object"));
+      throw Error("invalid food object");
     }
 
     await this._database.transactReadWrite({ storeNames: ["food"] },
@@ -116,11 +115,10 @@ class DatabaseFood {
     );
   }
 
-  async getKey(key) {
-    let requestFunctions = {};
-    let requestPromise = new Promise((resolve, reject) => {
-      requestFunctions.resolve = resolve;
-      requestFunctions.reject = reject;
+  async exists(key) {
+    let requestPromiseResolve;
+    let requestPromise = new Promise((resolve) => {
+      requestPromiseResolve = resolve;
     });
 
     await this._database.transactReadOnly({ storeNames: ["food"] },
@@ -128,7 +126,7 @@ class DatabaseFood {
         let request = stores.food.getKey(key);
 
         request.addEventListener("success", (event) => {
-          requestFunctions.resolve(request.result);
+          requestPromiseResolve(request.result);
         });
       }
     );
@@ -139,57 +137,39 @@ class DatabaseFood {
   }
 }
 
-async function validDiaryEntry(diary, database) {
-  // getKey is asynchronous
-  // Date parse implies a string is provided
-  // getKey implies an int is provided
-  return !isNaN(Date.parse(diary.dateString)) &&
-    database.food.getKey(diary.foodKey);
-}
-
 class DatabaseDiary {
   constructor(database) {
     this._database = database;
   }
 
   async create(diary) {
-    if (!validDiary(diary)) {
-      return Promise.reject(Error("invalid food object"));
+    let validData = await validDiaryEntry({ diary: diary, database: this._database });
+    if (!validData) {
+      throw Error("invalid diary entry");
     }
 
-    await this._database.transactReadWrite({ storeNames: ["food"] },
+    await this._database.transactReadWrite({ storeNames: ["diary"] },
       (stores) => {
-        stores.food.add(food);
+        stores.diary.add(diary);
       }
     );
   }
 
   async edit({ key, newFood }) {
-    if (!validFoodObject(newFood)) {
-      return Promise.reject(Error("invalid food object"));
-    }
-
-    await this._database.transactReadWrite({ storeNames: ["food"] },
-      (stores) => {
-        stores.food.put(newFood, key);
-      }
-    );
   }
 
   async remove(key) {
-    await this._database.transactReadWrite({ storeNames: ["food"] },
-      (stores) => {
-        stores.food.delete(key);
-      }
-    );
   }
 }
 
+async function validDiaryEntry({ diary, database }) {
+  let validDateString = !isNaN(Date.parse(diary.dateString));
+  let foodExists = await database.food.exists(diary.foodKey);
 
-// XXX rewrite
-/*
+  return validDateString && foodExists;
+}
 
-function queryFood({ databaseConnection, query }) {
+/* function queryFood({ databaseConnection, query }) {
   return new Promise((resolve, reject) => {
     let transaction = databaseConnection.transaction(
       ["food"], "readonly");
