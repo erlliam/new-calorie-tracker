@@ -8,14 +8,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
+    <nav id="open-buttons">
+      <button id="open-recent-foods">Recent foods</button
+      ><button id="open-food-search">Search for food</button
+      ><button id="open-create-food">Create food</button
+      ><button id="open-add-calories">Add calories</button>
+    </nav>
+
   <header>
-    <h1 id="diary-date"></h1>
+    <h1><button id="diary-date"></button></h1>
 
     <nav>
       <button id="diary-date-back">&lt;</button>
       <button id="diary-date-forward">&gt;</button>
     </nav>
   </header>
+
+
+  <form class="calender" hidden>
+    <input type="date">
+    <input type="submit" value="Go">
+  </form>
 
   <main>
     <article>
@@ -31,18 +44,13 @@
         </thead>
         <tbody>
           <tr>
-            <td id="calorie-goal" class="hidden">2000</td>
-            <td id="calorie-goal-active" class="hidden">
-              <form id="set-calorie-goal">
-                <input type="number" min="0"
-                ><input type="submit" value="->">
-              </form>
-            </td>
+            <td>20000</td>
             <td>1200</td>
-            <td>800</td>
+            <td>2414</td>
           </tr>
         </tbody>
       </table>
+      <button>⚙️</button>
     </article>
 
     <article>
@@ -59,24 +67,25 @@
 
         <tbody>
           <tr class="food">
-            <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</td>
-            <td>Ius an mutat scripta insolens. Duo probo dolor delenit et. Maiestatis incorrupte scribentur an vix, ex delenit expetenda nam, usu cu illum utamur perpetua. An usu ludus vocent, in sea iuvaret blandit.</td>
-            <td>200 calories</td>
+            <td>Potato</td>
+            <td>100 g</td>
+            <td>205 calories</td>
           </tr>
-
           <tr class="food">
-            <td>1</td>
-            <td>1 g</td>
-            <td>1 calories</td>
+            <td>Potato</td>
+            <td>100 g</td>
+            <td>205 calories</td>
           </tr>
-
-          <tr class="food">
-            <td colspan="3">+ Add to diary</td>
+          <tr>
+            <td id="add-to-diary" colspan="3">
+              <button id="add-to-diary-button">+ Add to diary</button>
+            </td>
           </tr>
         </tbody>
       </table>
     </article>
 
+  <article hidden>
     <nav id="open-buttons">
       <button id="open-recent-foods">Recent foods</button
       ><button id="open-food-search">Search for food</button
@@ -152,6 +161,7 @@
         <input type="submit" value="Add calories">
       </form>
     </section>
+  <article>
 
   </main>
 

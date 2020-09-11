@@ -1,4 +1,11 @@
+let date = new Date();
+console.log(date.toLocaleDateString());
+console.log(date.toLocaleString());
+console.log(date.toLocaleTimeString());
+
 (() => {
+  const DATABASE_NAME = "Calorie Tracker";
+
   let date = new Date();
   let calorieGoal = 1;
 
@@ -39,59 +46,26 @@
       }
     ]
   });
-})();
-/*
-let databaseConnection;
-(async () => {
-  try {
-    databaseConnection = await initializeDatabase();
-    console.log("Database initialized.");
 
-    // let savedFoodsTable = document.getElementById("saved-foods");
-    // let savedFoodsBody = savedFoodsTable.querySelector("tbody");
-    // displayAllFoods(databaseConnection, savedFoodsTable);
-  } catch(error) {
-    console.error(error);
-  }
+  (async () => {
+    let database = new Database({ name: DATABASE_NAME });
+    await database.ready;
+
+  })();
 })();
 
-let searchFoodForm = document.forms.namedItem("search-food");
+// await database.food.create(food);
+// await database.food.edit({ key: 1, newFood: {
+//   name: "edit test",
+//   servingSize: 1,
+//   unit: "g",
+//   calories: 1
+// }});
 
-searchFoodForm.addEventListener("submit", (event) => {
-  event.preventDefault();
+// let promiseArray = [];
+// for (let i = 0; i <= 25; i++) {
+//   promiseArray.push(database.food.remove(i));
+// }
 
-  let formData = new FormData(searchFoodForm);
-  let values = Object.fromEntries(formData.entries());
-
-  let queryPromise = queryFood({ databaseConnection: databaseConnection, query: values.query });
-  queryPromise.then((result) => {
-    console.log(result);
-  });
-});
-
-let createFoodForm = document.forms.namedItem("create-food");
-let createFoodStatus = createFoodForm.querySelector("span");
-
-createFoodForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  let formData = new FormData(createFoodForm);
-  let food = Object.fromEntries(formData.entries());
-
-  let createFoodPromise = createFood({
-    databaseConnection: databaseConnection, food: food
-  });
-
-  createFoodPromise.then(() => {
-    setTextTimeout(createFoodStatus,
-      "Food created.", 2000);
-    createFoodForm.reset();
-  });
-
-  createFoodPromise.catch((error) => {
-    setTextTimeout(createFoodStatus,
-      "Failed to create food.", 2000);
-    console.error(error);
-  });
-});
-*/
+// await Promise.all(promiseArray);
+// console.log("All foods deleted.");

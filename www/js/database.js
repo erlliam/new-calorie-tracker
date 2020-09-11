@@ -1,11 +1,8 @@
-const DATABASE_NAME = "Calorie Tracker";
-const FOOD_SCHEMA = [ "name", "servingSize", "unit", "calories" ];
-
 class Database {
   constructor({ name, version }) {
     this.ready = this._openDatabase({ name: name, version: version });
     this.food = new DatabaseFood(this);
-    // this.diary = new DatabaseDiary(this._connection);
+    this.diary = new DatabaseDiary(this);
   }
 
   _openDatabase({ name, version }) {
@@ -34,16 +31,16 @@ class Database {
 
   _createDatabase(connection) {
     let foodObjectStore = connection.createObjectStore(
-      "food", { "autoIncrement": true });
+      "food", { autoIncrement: true });
     foodObjectStore.createIndex("name", "name");
 
     // XXX
     // Implement diary pages. Decide on the key.
     let diaryObjectStore = connection.createObjectStore(
-      "diary", { "autoIncrement": true });
+      "diary", { keyPath: dateString });
   }
 
-  transact({ storeNames, mode, callback }) {
+  _transact({ storeNames, mode }, callback) {
     return new Promise((resolve, reject) => {
       let transaction = this._connection.transaction(
         storeNames, mode);
@@ -64,6 +61,22 @@ class Database {
       callback(stores);
     });
   }
+
+  transactReadWrite({ storeNames }, callback) {
+    return this._transact({
+      storeNames: storeNames,
+      mode: "readwrite" },
+      callback
+    );
+  }
+
+  transactReadOnly({ storeNames }, callback) {
+    return this._transact({
+      storeNames: storeNames,
+      mode: "readonly" },
+      callback
+    );
+  }
 }
 
 class DatabaseFood {
@@ -76,11 +89,11 @@ class DatabaseFood {
       return Promise.reject(Error("invalid food object"));
     }
 
-    await this._database.transact({
-      storeNames: ["food"], mode: "readwrite", callback: (stores) => {
+    await this._database.transactReadWrite({ storeNames: ["food"] },
+      (stores) => {
         stores.food.add(food);
       }
-    });
+    );
   }
 
   async edit({ key, newFood }) {
@@ -88,82 +101,77 @@ class DatabaseFood {
       return Promise.reject(Error("invalid food object"));
     }
 
-    await this._database.transact({
-      storeNames: ["food"], mode: "readwrite", callback: (stores) => {
+    await this._database.transactReadWrite({ storeNames: ["food"] },
+      (stores) => {
         stores.food.put(newFood, key);
       }
-    });
+    );
   }
 
   async remove(key) {
-    await this._database.transact({
-      storeNames: ["food"], mode: "readwrite", callback: (stores) => {
+    await this._database.transactReadWrite({ storeNames: ["food"] },
+      (stores) => {
         stores.food.delete(key);
       }
-    });
+    );
   }
 }
 
-(async () => {
-  let database = new Database({ name: DATABASE_NAME });
-  await database.ready;
+let diaryExample = {
+  dateString: "9/11/2020"
+  foodKey: 2
+}
 
-  let food = { name: "create test", servingSize: 1, unit: "g", calories: 1 };
+function validDiary(diary) {
+  if (!Date.parse(diary.dateString)) { return false };
+  // find foodKey in food objectStore
+  // prpoceed
+  // XXX
   
-  await database.food.create(food);
-  await database.food.edit({ key: 1, newFood: {
-    name: "edit test",
-    servingSize: 1,
-    unit: "g",
-    calories: 1
-  }});
+}
 
-  let promiseArray = [];
-  for (let i = 0; i <= 19; i++) {
-    promiseArray.push(database.food.remove(i));
+class DatabaseDiary {
+  constructor(database) {
+    this._database = database;
   }
 
-  await Promise.all(promiseArray);
-  console.log("All foods deleted.");
-})();
+  async create(diary) {
+    if (!validDiary(diary)) {
+      return Promise.reject(Error("invalid food object"));
+    }
 
-function deleteDatabase() {
-  return new Promise((resolve, reject) => {
-    let openRequest = indexedDB.deleteDatabase(DATABASE_NAME);
-
-    openRequest.onerror = (event) => {
-      reject(openRequest.error);
-    };
-
-    openRequest.onsuccess = (event) => {
-      resolve(openRequest.result);
-    };
-  });
-}
-
-function convertPropertyToNumber({ object, property }) {
-  let value = object[property];
-  if (typeof value === "number") return true;
-
-  let number = Number(value);
-  if (isNaN(number)) return false;
-
-  object[property] = number;
-  return true;
-}
-
-function validFoodObject(food) {
-  if (!arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA) ||
-      !convertPropertyToNumber({ object: food, property: "servingSize" }) ||
-      !convertPropertyToNumber({ object: food, property: "calories" })) {
-    return false;
+    await this._database.transactReadWrite({ storeNames: ["food"] },
+      (stores) => {
+        stores.food.add(food);
+      }
+    );
   }
 
-  return true;
+  async edit({ key, newFood }) {
+    if (!validFoodObject(newFood)) {
+      return Promise.reject(Error("invalid food object"));
+    }
+
+    await this._database.transactReadWrite({ storeNames: ["food"] },
+      (stores) => {
+        stores.food.put(newFood, key);
+      }
+    );
+  }
+
+  async remove(key) {
+    await this._database.transactReadWrite({ storeNames: ["food"] },
+      (stores) => {
+        stores.food.delete(key);
+      }
+    );
+  }
 }
 
-// XXX should I use a cursor here?
-// perhaps we are better off doing two requests?
+
+// XXX rewrite
+/*
+
 function queryFood({ databaseConnection, query }) {
   return new Promise((resolve, reject) => {
     let transaction = databaseConnection.transaction(
@@ -222,42 +230,41 @@ function getFoodsInRange({ databaseConnection, startingKey, count }) {
   });
 }
 
-function displayAllFoods(databaseConnection, table) {
-  let tableBody = table.querySelector("tbody");
-  let transaction = databaseConnection.transaction(
-    ["food"], "readonly");
-  let foodObjectStore = transaction.objectStore("food");
+*/
+function deleteDatabase() {
+  return new Promise((resolve, reject) => {
+    let request = indexedDB.deleteDatabase(DATABASE_NAME);
 
-  let cursorRequest = foodObjectStore.openCursor();
-  cursorRequest.onsuccess = (event) => {
-    let cursor = cursorRequest.result;
-    if (cursor) {
-      let row = document.createElement("tr");
-      row.setAttribute("data-id", cursor.primaryKey);
+    request.onerror = (event) => {
+      reject(request.error);
+    };
 
-      let tdName = document.createElement("td");
-      tdName.textContent = cursor.value.name;
-
-      let tdServingSize = document.createElement("td");
-      tdServingSize.textContent =
-        `${cursor.value.servingSize} ${cursor.value.unit}`;
-
-      let tdCalories = document.createElement("td");
-      tdCalories.textContent = cursor.value.calories;
-      
-      let tdButtons = document.createElement("td");
-      tdButtons.innerHTML =
-        `<button>Add to diary</button>
-        <button>Edit</button>
-        <button>Delete</button>`;
-
-      row.appendChild(tdName);
-      row.appendChild(tdServingSize);
-      row.appendChild(tdCalories);
-      row.appendChild(tdButtons);
-      tableBody.appendChild(row);
-
-      cursor.continue();
-    }
-  };
+    request.onsuccess = (event) => {
+      resolve();
+    };
+  });
 }
+
+function convertPropertyToNumber({ object, property }) {
+  let value = object[property];
+  if (typeof value === "number") return true;
+
+  let number = Number(value);
+  if (isNaN(number)) return false;
+
+  object[property] = number;
+  return true;
+}
+
+const FOOD_SCHEMA = [ "name", "servingSize", "unit", "calories" ];
+
+function validFoodObject(food) {
+  if (!arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA) ||
+      !convertPropertyToNumber({ object: food, property: "servingSize" }) ||
+      !convertPropertyToNumber({ object: food, property: "calories" })) {
+    return false;
+  }
+
+  return true;
+}
+

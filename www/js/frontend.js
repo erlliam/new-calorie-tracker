@@ -1,3 +1,13 @@
+let diaryDate = document.getElementById("diary-date");
+let diaryDateBack = document.getElementById("diary-date-back");
+let diaryDateForward = document.getElementById("diary-date-forward");
+
+diaryDate.addEventListener("click", (event) => {
+  console.log("We open a calender now.");
+});
+
+
+
 class HeaderDate {
   constructor({ date, textElement, backButton, forwardButton }) {
     this._date = date;

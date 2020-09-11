@@ -1,11 +1,9 @@
-.hidden {
-  display: none;
+body {
+  height: 400vh;
 }
 
-.food {
-  cursor: pointer;
-  border-top: 1px solid #dddddd;
-  border-bottom: 1px solid #dddddd;
+.hidden {
+  display: none;
 }
 
 :root {
@@ -13,11 +11,48 @@
   font-family: "Roboto", sans-serif;
 }
 
-
 body {
   margin: 0;
+  background-color: #ffffff;
 }
 
+header {
+  text-align: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  background-color: #fbe9b3;
+  border-bottom: 1px solid #bbbbbb;
+}
+
+header h1 {
+  margin-top: 0;
+  margin-bottom: .5rem;
+  font-size: 1.9rem;
+}
+
+main {
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+main > article {
+  margin: 1rem;
+}
+
+main > article > h2 {
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+section h3 {
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.arrow,
 button,
 input[type="submit"] {
   font-size: 1rem;
@@ -28,54 +63,26 @@ input[type="submit"] {
   background-color: #f4f4f4;
 }
 
-#calorie-goal {
-  display: inline-block;
-  padding: .35rem .5rem;
-  background-color: #f4f4f4;
-  border: 1px solid #bbbbbb;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-#calorie-goal-active form {
-  margin-left: 0;
-}
-
-#calorie-goal-active input[type="number"] {
-  appearance: textfield;
-  width: 3rem;
-  padding: .35rem .5rem;
-  border: 1px solid #bbbbbb;
-  border-right: 0;
-  border-radius: 8px 0 0 8px;
-}
-
-#calorie-goal-active input[type="submit"] {
-  width: 3rem;
-  padding: .35rem .5rem;
-  background-color: #f4f4f4;
-  border: 1px solid #bbbbbb;
-  border-radius: 0 8px 8px 0;
-  cursor: pointer;
-}
-
 button:hover,
 input[type="submit"]:hover {
   background-color: #dddddd;
 }
 
-.overview-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.overview-table thead {
+thead {
   color: #555555;
 }
 
-.overview-table tbody {
+tbody {
   font-size: 1.2rem;
   text-align: center;
+}
+
+.overview-table {
+  width: 100%;
+}
+
+.overview-table tbody {
+  font-size: 1.4rem;
 }
 
 .food-table {
@@ -84,26 +91,28 @@ input[type="submit"]:hover {
   border-collapse: collapse;
 }
 
-.food-table thead {
-  color: #555555;
-}
-
-.food-table tbody {
-  font-size: 1.2rem;
-  text-align: center;
-}
-
-.food-table tbody tr:nth-child(2n) {
-  background-color: #f4f4f4;
-}
-
-.food-table th {
+.food-table th,
+.food-table td {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
 
-.food-table td {
-  height: 50px;
+.food {
+  cursor: pointer;
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+}
+
+#add-to-diary {
+  padding: 0;
+}
+
+#add-to-diary-button {
+  font-size: 1.2rem;
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  padding: 1rem 0;
 }
 
 form {
@@ -125,52 +134,4 @@ input {
 .label-input {
   margin-top: 1rem;
   margin-bottom: 1rem;
-}
-
-header {
-  text-align: center;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  background-color: #fbe9b3;
-  border-bottom: 1px solid #bbbbbb;
-}
-
-header > h1 {
-  margin-top: 0;
-  margin-bottom: .5rem;
-  font-size: 1.9rem;
-}
-
-
-main {
-  max-width: 40rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-main > article {
-  margin: 1rem;
-}
-
-main > article > h2 {
-  font-weight: 400;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  font-size: 1.7rem;
-}
-
-section h3 {
-  font-weight: 400;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-}
-
-#open-buttons {
-  text-align: center;
-}
-
-#open-buttons button {
-  margin: .25rem .25rem;
-  width: 160px;
 }
