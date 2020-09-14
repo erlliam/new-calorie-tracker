@@ -42,7 +42,7 @@ class HeaderDate {
 class AddToDiaryButtons {
   constructor({ cssClass, elementButtonArray }) {
     this._currentlyToggled = null;
-    this._cssClass = cssClass
+    this._cssClass = cssClass;
 
     for (let elementButton of elementButtonArray) {
       elementButton.button.onclick = () => {
@@ -64,8 +64,7 @@ class AddToDiaryButtons {
   _close() {
     this._currentlyToggled.classList.toggle(this._cssClass);
     this._currentlyToggled = null;
-    
-  };
+  }
 
   _onclick({ button, element }) {
     if (this._currentlyToggled === null) {

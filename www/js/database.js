@@ -23,7 +23,7 @@ class Database {
       });
 
       request.addEventListener("upgradeneeded", (event) => {
-        let connection = request.result
+        let connection = request.result;
         this._createDatabase(connection);
       });
     });
@@ -36,7 +36,7 @@ class Database {
 
     let diaryObjectStore = connection.createObjectStore(
       "diary", { autoIncrement: true });
-    diaryObjectStore.createIndex("date", "dateString");
+    diaryObjectStore.createIndex("dateString", "dateString");
   }
 
   _transact({ storeNames, mode }, callback) {
@@ -137,11 +137,27 @@ class DatabaseFood {
   }
 }
 
+// XXX
+// Make use of this function in the validDate checker
+function validDateString(dateString) {
+  return !isNaN(Date.parse(dateString));
+}
+
+// XXX refactor
+// create/edit/remove functions seem to be identical.
+// The only differences are the storeNames used and the
+// input validation.
+// XXX
+// We can call that function objectStoreInputValidation
+
 class DatabaseDiary {
   constructor(database) {
     this._database = database;
   }
 
+  // XXX
+  // Diaries need to have a dateString, foodKey, and servingSize
+  // Validte the foodKey and servingSize input better.
   async create(diary) {
     let validData = await validDiaryEntry({ diary: diary, database: this._database });
     if (!validData) {
@@ -160,6 +176,30 @@ class DatabaseDiary {
 
   async remove(key) {
   }
+
+  async query({ dateString }) {
+    if (!validDateString(dateString)) {
+      throw Error("invalid date string");
+    }
+
+    let resolveResult;
+    let result = new Promise((resolve) => {
+      resolveResult = resolve;
+    });
+
+    await this._database.transactReadOnly({ storeNames: ["diary"] },
+      (stores) => {
+        let index = stores.diary.index("dateString");
+        let request = index.getAll(dateString);
+
+        request.addEventListener("success", (event) => {
+          resolveResult(request.result);
+        });
+      }
+    );
+
+    return await result;
+  }
 }
 
 async function validDiaryEntry({ diary, database }) {
@@ -169,65 +209,6 @@ async function validDiaryEntry({ diary, database }) {
   return validDateString && foodExists;
 }
 
-/* function queryFood({ databaseConnection, query }) {
-  return new Promise((resolve, reject) => {
-    let transaction = databaseConnection.transaction(
-      ["food"], "readonly");
-    let index = transaction.objectStore("food").index("name");
-    let request = index.openCursor(query);
-
-    rejectOnRequestOrTransactionError({reject: reject,
-      transaction: transaction, request: request });
-
-    let array = [];
-
-    request.onsuccess = () => {
-      let cursor = request.result;
-      if (cursor) {
-        array.push({
-          primaryKey: cursor.primaryKey,
-          value: cursor.value
-        });
-
-        cursor.continue();
-      } else {
-        transaction.oncomplete = () => { resolve(array); };
-      }
-    };
-  });
-}
-
-function getFoodsInRange({ databaseConnection, startingKey, count }) {
-  return new Promise((resolve, reject) => {
-    let transaction = databaseConnection.transaction(
-      ["food"], "readonly");
-    let request = transaction.objectStore("food").openCursor(
-      IDBKeyRange.lowerBound(startingKey));
-
-    rejectOnRequestOrTransactionError({reject: reject,
-      transaction: transaction, request: request });
-
-    let array = [];
-    let index = 0;
-
-    request.onsuccess = () => {
-      let cursor = request.result;
-      if (cursor && index < count) {
-        index += 1;
-        array.push({
-          primaryKey: cursor.primaryKey,
-          value: cursor.value
-        });
-
-        cursor.continue();
-      } else {
-        transaction.oncomplete = () => { resolve(array); };
-      }
-    };
-  });
-}
-
-*/
 function deleteDatabase() {
   return new Promise((resolve, reject) => {
     let request = indexedDB.deleteDatabase(DATABASE_NAME);
@@ -260,4 +241,3 @@ function validFoodObject(food) {
     convertPropertyToNumber({ object: food, property: "servingSize" }) &&
     convertPropertyToNumber({ object: food, property: "calories" });
 }
-
