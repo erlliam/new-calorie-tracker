@@ -155,12 +155,18 @@ class DatabaseDiary {
     this._database = database;
   }
 
-  // XXX
-  // Diaries need to have a dateString, foodKey, and servingSize
-  // Validte the foodKey and servingSize input better.
+  async _dataValidator(data) {
+    // dateString: string, foodKey: number, servingSize: number
+    let validDateString = !isNaN(Date.parse(data.dateString));
+
+    return validDateString &&
+      typeof data.servingSize === "number" &&
+      data.servingSize > 0 &&
+      await this._database.food.exists(data.foodKey);
+  }
+
   async create(diary) {
-    let validData = await validDiaryEntry({ diary: diary, database: this._database });
-    if (!validData) {
+    if (!(await this._dataValidator(diary))) {
       throw Error("invalid diary entry");
     }
 
@@ -200,13 +206,6 @@ class DatabaseDiary {
 
     return await result;
   }
-}
-
-async function validDiaryEntry({ diary, database }) {
-  let validDateString = !isNaN(Date.parse(diary.dateString));
-  let foodExists = await database.food.exists(diary.foodKey);
-
-  return validDateString && foodExists;
 }
 
 function deleteDatabase() {
