@@ -137,8 +137,6 @@ class DatabaseFood {
   }
 }
 
-// XXX
-// Make use of this function in the validDate checker
 function validDateString(dateString) {
   return !isNaN(Date.parse(dateString));
 }
@@ -156,10 +154,7 @@ class DatabaseDiary {
   }
 
   async _dataValidator(data) {
-    // dateString: string, foodKey: number, servingSize: number
-    let validDateString = !isNaN(Date.parse(data.dateString));
-
-    return validDateString &&
+    return validDateString(data.dateString) &&
       typeof data.servingSize === "number" &&
       data.servingSize > 0 &&
       await this._database.food.exists(data.foodKey);
@@ -177,10 +172,25 @@ class DatabaseDiary {
     );
   }
 
-  async edit({ key, newFood }) {
+  async edit({ key, newDiary }) {
+    if (!(await this._dataValidator(newDiary))) {
+      throw Error("invalid diary entry");
+    }
+
+    await this._database.transactReadWrite({ storeNames: ["diary"] },
+      (stores) => {
+        console.log("Um");
+        stores.diary.put(newDiary, key);
+      }
+    );
   }
 
   async remove(key) {
+    await this._database.transactReadWrite({ storeNames: ["diary"] },
+      (stores) => {
+        stores.diary.delete(key);
+      }
+    );
   }
 
   async query({ dateString }) {
@@ -196,10 +206,18 @@ class DatabaseDiary {
     await this._database.transactReadOnly({ storeNames: ["diary"] },
       (stores) => {
         let index = stores.diary.index("dateString");
-        let request = index.getAll(dateString);
+        let request = index.openCursor(dateString);
+
+        let entriesArray = [];
 
         request.addEventListener("success", (event) => {
-          resolveResult(request.result);
+          let cursor = request.result;
+          if (cursor) {
+            entriesArray.push({ key: cursor.primaryKey, value: cursor.value });
+            cursor.continue();
+          } else {
+            resolveResult(entriesArray);
+          }
         });
       }
     );
