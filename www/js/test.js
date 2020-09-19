@@ -14,7 +14,7 @@ let diaryExample = { dateString: "9/11/2020", foodKey: 1, servingSize: 1 };
 
 async function foodDatabaseTest(database) {
   console.log("validFoodObject: " +
-    validFoodObject(foodExample));
+    database.food._dataValidator(foodExample));
 
   await database.food.create(foodExample);
   console.log("Potato created");
@@ -22,6 +22,7 @@ async function foodDatabaseTest(database) {
 
   console.log(`Database key ${keyToCheck} exists: \
 ${await database.food.exists(keyToCheck)}`);
+  console.log(await database.food.exists(1));
 }
 
 async function diaryDatabaseTest(database) {

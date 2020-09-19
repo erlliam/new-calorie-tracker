@@ -1,3 +1,22 @@
+function validDateString(dateString) {
+  return !isNaN(Date.parse(dateString));
+}
+
+function convertPropertyToNumber({ object, property }) {
+  let value = object[property];
+  if (typeof value === "number") return true;
+
+  let number = Number(value);
+  if (isNaN(number)) return false;
+
+  object[property] = number;
+  return true;
+}
+
+function numberOverZero(number) {
+  return typeof number === "number" && number > 0;
+}
+
 class Database {
   constructor({ name, version }) {
     this.ready = this._openDatabase({ name: name, version: version });
@@ -83,9 +102,15 @@ class DatabaseFood {
     this._database = database;
   }
 
+  _dataValidator(data) {
+    return typeof data.name === "string" &&
+      numberOverZero(data.servingSize) &&
+      numberOverZero(data.calories);
+  }
+
   async create(food) {
-    if (!validFoodObject(food)) {
-      throw Error("invalid food object");
+    if (!this._dataValidator(food)) {
+      throw TypeError("invalid food object");
     }
 
     await this._database.transactReadWrite({ storeNames: ["food"] },
@@ -96,8 +121,8 @@ class DatabaseFood {
   }
 
   async edit({ key, newFood }) {
-    if (!validFoodObject(newFood)) {
-      throw Error("invalid food object");
+    if (!this._dataValidator(newFood)) {
+      throw TypeError("invalid food object");
     }
 
     await this._database.transactReadWrite({ storeNames: ["food"] },
@@ -116,9 +141,9 @@ class DatabaseFood {
   }
 
   async exists(key) {
-    let requestPromiseResolve;
-    let requestPromise = new Promise((resolve) => {
-      requestPromiseResolve = resolve;
+    let resolveResult;
+    let result = new Promise((resolve) => {
+      resolveResult = resolve;
     });
 
     await this._database.transactReadOnly({ storeNames: ["food"] },
@@ -126,19 +151,13 @@ class DatabaseFood {
         let request = stores.food.getKey(key);
 
         request.addEventListener("success", (event) => {
-          requestPromiseResolve(request.result);
+          resolveResult(request.result);
         });
       }
     );
 
-    let result = await requestPromise;
-
-    return result !== undefined;
+    return await result !== undefined;
   }
-}
-
-function validDateString(dateString) {
-  return !isNaN(Date.parse(dateString));
 }
 
 // XXX refactor
@@ -155,14 +174,13 @@ class DatabaseDiary {
 
   async _dataValidator(data) {
     return validDateString(data.dateString) &&
-      typeof data.servingSize === "number" &&
-      data.servingSize > 0 &&
+      numberOverZero(data.servingSize) &&
       await this._database.food.exists(data.foodKey);
   }
 
   async create(diary) {
     if (!(await this._dataValidator(diary))) {
-      throw Error("invalid diary entry");
+      throw TypeError("invalid diary entry");
     }
 
     await this._database.transactReadWrite({ storeNames: ["diary"] },
@@ -174,12 +192,11 @@ class DatabaseDiary {
 
   async edit({ key, newDiary }) {
     if (!(await this._dataValidator(newDiary))) {
-      throw Error("invalid diary entry");
+      throw TypeError("invalid diary entry");
     }
 
     await this._database.transactReadWrite({ storeNames: ["diary"] },
       (stores) => {
-        console.log("Um");
         stores.diary.put(newDiary, key);
       }
     );
@@ -195,7 +212,7 @@ class DatabaseDiary {
 
   async query({ dateString }) {
     if (!validDateString(dateString)) {
-      throw Error("invalid date string");
+      throw TypeError("invalid date string");
     }
 
     let resolveResult;
@@ -238,23 +255,4 @@ function deleteDatabase() {
       resolve();
     };
   });
-}
-
-function convertPropertyToNumber({ object, property }) {
-  let value = object[property];
-  if (typeof value === "number") return true;
-
-  let number = Number(value);
-  if (isNaN(number)) return false;
-
-  object[property] = number;
-  return true;
-}
-
-const FOOD_SCHEMA = [ "name", "servingSize", "unit", "calories" ];
-
-function validFoodObject(food) {
-  return arraysMatchAnyOrder(Object.keys(food), FOOD_SCHEMA) &&
-    convertPropertyToNumber({ object: food, property: "servingSize" }) &&
-    convertPropertyToNumber({ object: food, property: "calories" });
 }
