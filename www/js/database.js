@@ -16,20 +16,20 @@ class Database {
     return new Promise((resolve, reject) => {
       let request = indexedDB.open(name, version);
 
-      request.addEventListener("error", (event) => {
+      request.addEventListener("error", (_event) => {
         reject(request.error);
       });
 
-      request.addEventListener("blocked", (event) => {
+      request.addEventListener("blocked", (_event) => {
         console.warn("indexedDB.open blocked");
       });
 
-      request.addEventListener("success", (event) => {
+      request.addEventListener("success", (_event) => {
         this._connection = request.result;
         resolve();
       });
 
-      request.addEventListener("upgradeneeded", (event) => {
+      request.addEventListener("upgradeneeded", (_event) => {
         let connection = request.result;
         this._createDatabase(connection);
       });
@@ -51,11 +51,11 @@ class Database {
       let transaction = this._connection.transaction(
         storeNames, mode);
 
-      transaction.addEventListener("error", (event) => {
-        reject(event.target.error);
+      transaction.addEventListener("error", (_event) => {
+        reject(transaction.error);
       });
 
-      transaction.addEventListener("complete", (event) => {
+      transaction.addEventListener("complete", (_event) => {
         resolve();
       });
 
@@ -93,7 +93,8 @@ class DatabaseFood {
   }
 
   _dataValidator(data) {
-    return typeof data.name === "string" &&
+    return data !== undefined &&
+      typeof data.name === "string" &&
       numberOverZero(data.servingSize) &&
       numberOverZero(data.calories);
   }
@@ -138,7 +139,7 @@ class DatabaseFood {
       (stores) => {
         let request = stores.food.get(key);
 
-        request.addEventListener("success", (event) => {
+        request.addEventListener("success", (_event) => {
           resolveResult(request.result);
         });
       }
@@ -157,7 +158,8 @@ class DatabaseDiary {
   }
 
   async _dataValidator(data) {
-    return validDateString(data.dateString) &&
+    return data !== undefined &&
+      validDateString(data.dateString) &&
       numberOverZero(data.servingSize) &&
       await this._database.food.exists(data.foodKey);
   }
@@ -209,7 +211,7 @@ class DatabaseDiary {
 
         let entriesArray = [];
 
-        request.addEventListener("success", (event) => {
+        request.addEventListener("success", (_event) => {
           let cursor = request.result;
           if (cursor) {
             entriesArray.push({ key: cursor.primaryKey, value: cursor.value });
@@ -228,11 +230,11 @@ function deleteDatabase() {
   return new Promise((resolve, reject) => {
     let request = indexedDB.deleteDatabase(DATABASE_NAME);
 
-    request.onerror = (event) => {
+    request.onerror = (_event) => {
       reject(request.error);
     };
 
-    request.onsuccess = (event) => {
+    request.onsuccess = (_event) => {
       resolve();
     };
   });

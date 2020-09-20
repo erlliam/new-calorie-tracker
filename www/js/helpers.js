@@ -35,6 +35,15 @@ function validDateString(dateString) {
   return !isNaN(Date.parse(dateString));
 }
 
+function getDateString(date) {
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+
 function convertPropertyToNumber({ object, property }) {
   let value = object[property];
   if (typeof value === "number") return true;

@@ -1,8 +1,9 @@
-const DATABASE_NAME = "Calorie Tracker";
-let foodExample = { name: "Potato", servingSize: 1, unit: "g", calories: 100 };
-let diaryExample = { dateString: "9/11/2020", foodKey: 1, servingSize: 1 };
 
 (async () => {
+  const DATABASE_NAME = "Calorie Tracker";
+  let foodExample = { name: "Potato", servingSize: 1, unit: "g", calories: 100 };
+  let diaryExample = { dateString: "9/11/2020", foodKey: 1, servingSize: 1 };
+
   deleteDatabase();
   let database = new Database({ name: DATABASE_NAME });
   await database.ready;

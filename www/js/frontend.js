@@ -1,82 +1,77 @@
-let diaryDate = document.getElementById("diary-date");
-let diaryDateBack = document.getElementById("diary-date-back");
-let diaryDateForward = document.getElementById("diary-date-forward");
+function initializeHeader(date) {
+  let diaryDate = document.getElementById("diary-date");
+  let diaryDateBack = document.getElementById("diary-date-back");
+  let diaryDateForward = document.getElementById("diary-date-forward");
 
-diaryDate.addEventListener("click", (event) => {
-  console.log("We open a calender now.");
-});
-
-
-
-class HeaderDate {
-  constructor({ date, textElement, backButton, forwardButton }) {
-    this._date = date;
-    this._textElement = textElement;
-    this._backButton = backButton;
-    this._forwardButton = forwardButton;
-
-    this._init();
+  function updateText() {
+    diaryDate.textContent = getDateString(date);
   }
 
-  _init() {
-    this._updateText();
-    this._forwardButton.onclick = () => { this._changeDate(1); };
-    this._backButton.onclick = () => { this._changeDate(-1); };
+  function changeDate(days) {
+    let time = date.getTime();
+    date.setTime(time + (days * (1000 * 60 * 60 * 24)));
   }
 
-  _updateText() {
-    this._textElement.textContent = this._date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+  function changeDateUpdateText(days) {
+    changeDate(days);
+    updateText();
+  }
+
+  updateText();
+
+  diaryDate.addEventListener("click", (_event) => {
+    console.warn("Implement a pop-up calender.");
+  });
+  diaryDateBack.addEventListener("click", (_event) => {
+    changeDateUpdateText(-1);
+  });
+  diaryDateForward.addEventListener("click", (_event) => {
+    changeDateUpdateText(1);
+  });
+}
+
+function initializeDiary() {
+  let addToDiary = document.getElementById("add-to-diary-button");
+  let diaryOptions = document.getElementById("diary-options");
+  let panelOpen = undefined;
+
+  addToDiary.addEventListener("click", (_event) => {
+    let diaryOptionsHidden = diaryOptions.classList.toggle("hidden");
+    if (diaryOptionsHidden) {
+      console.warn("Reset the diary option panels.");
+    }
+  });
+
+
+  function buttonOpensPanel({ button, panel }) {
+    button.addEventListener("click", (_event) => {
+      let hidden = panel.classList.toggle("hidden");
+
+      if (panelOpen !== undefined) {
+        panelOpen.classList.toggle("hidden", true);
+      }
+
+      if (hidden) {
+        panelOpen = undefined;
+      } else {
+        panelOpen = panel;
+      }
     });
   }
 
-  _changeDate(amount) {
-    let time = this._date.getTime();
-    this._date.setTime(time + amount * (1000 * 60 * 60 * 24));
-    this._updateText();
-  }
+  let openRecentFoods = document.getElementById("open-recent-foods");
+  let recentFoods = document.getElementById("recent-foods");
+  buttonOpensPanel({ button: openRecentFoods, panel: recentFoods });
+
+  let openFoodSearch = document.getElementById("open-food-search");
+  let foodSearch = document.getElementById("food-search");
+  buttonOpensPanel({ button: openFoodSearch, panel: foodSearch });
+
+  let openCreateFood = document.getElementById("open-create-food");
+  let createFood = document.getElementById("create-food");
+  buttonOpensPanel({ button: openCreateFood, panel: createFood });
+
+  let openAddCalories = document.getElementById("open-add-calories");
+  let addCalories = document.getElementById("add-calories");
+  buttonOpensPanel({ button: openAddCalories, panel: addCalories });
 }
-
-class AddToDiaryButtons {
-  constructor({ cssClass, elementButtonArray }) {
-    this._currentlyToggled = null;
-    this._cssClass = cssClass;
-
-    for (let elementButton of elementButtonArray) {
-      elementButton.button.onclick = () => {
-        this._onclick({
-          element: elementButton.element,
-          button: elementButton.button
-        });
-      };
-    }
-  }
-
-  _open(element) {
-    element.classList.toggle(this._cssClass);
-    // XXX decide on desired behavior
-    // window.scrollTo(0, element.offsetTop);
-    this._currentlyToggled = element;
-  }
-
-  _close() {
-    this._currentlyToggled.classList.toggle(this._cssClass);
-    this._currentlyToggled = null;
-  }
-
-  _onclick({ button, element }) {
-    if (this._currentlyToggled === null) {
-      this._open(element);
-    } else {
-      if (this._currentlyToggled === element) {
-        this._close()
-      } else {
-        this._close();
-        this._open(element);
-      }
-    }
-  }
-}
-
