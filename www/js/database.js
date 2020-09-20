@@ -1,21 +1,9 @@
-function validDateString(dateString) {
-  return !isNaN(Date.parse(dateString));
-}
-
-function convertPropertyToNumber({ object, property }) {
-  let value = object[property];
-  if (typeof value === "number") return true;
-
-  let number = Number(value);
-  if (isNaN(number)) return false;
-
-  object[property] = number;
-  return true;
-}
-
-function numberOverZero(number) {
-  return typeof number === "number" && number > 0;
-}
+// XXX refactor
+// create/edit/remove functions seem to be identical.
+// The only differences are the storeNames used and the
+// input validation.
+// XXX
+// We can call that function objectStoreInputValidation
 
 class Database {
   constructor({ name, version }) {
@@ -82,16 +70,18 @@ class Database {
 
   transactReadWrite({ storeNames }, callback) {
     return this._transact({
-      storeNames: storeNames,
-      mode: "readwrite" },
+        storeNames: storeNames,
+        mode: "readwrite"
+      },
       callback
     );
   }
 
   transactReadOnly({ storeNames }, callback) {
     return this._transact({
-      storeNames: storeNames,
-      mode: "readonly" },
+        storeNames: storeNames,
+        mode: "readonly"
+      },
       callback
     );
   }
@@ -108,26 +98,26 @@ class DatabaseFood {
       numberOverZero(data.calories);
   }
 
-  async create(food) {
-    if (!this._dataValidator(food)) {
+  async create(data) {
+    if (!this._dataValidator(data)) {
       throw TypeError("invalid food object");
     }
 
     await this._database.transactReadWrite({ storeNames: ["food"] },
       (stores) => {
-        stores.food.add(food);
+        stores.food.add(data);
       }
     );
   }
 
-  async edit({ key, newFood }) {
-    if (!this._dataValidator(newFood)) {
+  async edit({ key, data }) {
+    if (!this._dataValidator(data)) {
       throw TypeError("invalid food object");
     }
 
     await this._database.transactReadWrite({ storeNames: ["food"] },
       (stores) => {
-        stores.food.put(newFood, key);
+        stores.food.put(data, key);
       }
     );
   }
@@ -140,32 +130,26 @@ class DatabaseFood {
     );
   }
 
-  async exists(key) {
+  async query({ key }) {
     let resolveResult;
-    let result = new Promise((resolve) => {
-      resolveResult = resolve;
-    });
+    let result = new Promise((resolve) => { resolveResult = resolve; });
 
     await this._database.transactReadOnly({ storeNames: ["food"] },
       (stores) => {
-        let request = stores.food.getKey(key);
+        let request = stores.food.get(key);
 
         request.addEventListener("success", (event) => {
           resolveResult(request.result);
         });
       }
     );
+    return await result;
+  }
 
-    return await result !== undefined;
+  async exists({ key }) {
+    return await this.query({ key: key }) !== undefined;
   }
 }
-
-// XXX refactor
-// create/edit/remove functions seem to be identical.
-// The only differences are the storeNames used and the
-// input validation.
-// XXX
-// We can call that function objectStoreInputValidation
 
 class DatabaseDiary {
   constructor(database) {
@@ -178,26 +162,26 @@ class DatabaseDiary {
       await this._database.food.exists(data.foodKey);
   }
 
-  async create(diary) {
-    if (!(await this._dataValidator(diary))) {
+  async create(data) {
+    if (!(await this._dataValidator(data))) {
       throw TypeError("invalid diary entry");
     }
 
     await this._database.transactReadWrite({ storeNames: ["diary"] },
       (stores) => {
-        stores.diary.add(diary);
+        stores.diary.add(data);
       }
     );
   }
 
-  async edit({ key, newDiary }) {
-    if (!(await this._dataValidator(newDiary))) {
+  async edit({ key, data }) {
+    if (!(await this._dataValidator(data))) {
       throw TypeError("invalid diary entry");
     }
 
     await this._database.transactReadWrite({ storeNames: ["diary"] },
       (stores) => {
-        stores.diary.put(newDiary, key);
+        stores.diary.put(data, key);
       }
     );
   }
@@ -216,9 +200,7 @@ class DatabaseDiary {
     }
 
     let resolveResult;
-    let result = new Promise((resolve) => {
-      resolveResult = resolve;
-    });
+    let result = new Promise((resolve) => { resolveResult = resolve; });
 
     await this._database.transactReadOnly({ storeNames: ["diary"] },
       (stores) => {
@@ -238,7 +220,6 @@ class DatabaseDiary {
         });
       }
     );
-
     return await result;
   }
 }

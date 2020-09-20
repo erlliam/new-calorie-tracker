@@ -31,3 +31,21 @@ function handleSubmitEvent({ form, callback }) {
   }
 }
 
+function validDateString(dateString) {
+  return !isNaN(Date.parse(dateString));
+}
+
+function convertPropertyToNumber({ object, property }) {
+  let value = object[property];
+  if (typeof value === "number") return true;
+
+  let number = Number(value);
+  if (isNaN(number)) return false;
+
+  object[property] = number;
+  return true;
+}
+
+function numberOverZero(number) {
+  return typeof number === "number" && number > 0;
+}

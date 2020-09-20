@@ -7,9 +7,8 @@ let diaryExample = { dateString: "9/11/2020", foodKey: 1, servingSize: 1 };
   let database = new Database({ name: DATABASE_NAME });
   await database.ready;
 
-  foodDatabaseTest(database);
-  diaryDatabaseTest(database);
-
+  // foodDatabaseTest(database);
+  // diaryDatabaseTest(database);
 })();
 
 async function foodDatabaseTest(database) {
@@ -27,10 +26,7 @@ ${await database.food.exists(keyToCheck)}`);
 
 async function diaryDatabaseTest(database) {
   await database.diary.create(diaryExample);
-  await database.diary.create(diaryExample);
-  await database.diary.create(diaryExample);
-  await database.diary.create(diaryExample);
-  await database.diary.remove(3);
+
   let entries = await database.diary.query({
     dateString: diaryExample.dateString });
   console.log(entries);
