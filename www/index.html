@@ -68,15 +68,15 @@
           </tr>
         </tbody>
       </table>
-
-      <section>
-        <nav id="diary-options" class="hidden">
-          <button id="open-recent-foods">Recent foods</button
-          ><button id="open-food-search">Search for food</button
-          ><button id="open-create-food">Create food</button
-          ><button id="open-add-calories">Add calories</button>
-        </nav>
-      </section>
+    </article>
+    
+    <article id="diary-options" class="hidden">
+      <nav>
+        <button id="open-recent-foods">Recent foods</button
+        ><button id="open-food-search">Search for food</button
+        ><button id="open-create-food">Create food</button
+        ><button id="open-add-calories">Add calories</button>
+      </nav>
 
       <section id="recent-foods" class="hidden">
         <h3>Recent foods</h3>
@@ -98,56 +98,48 @@
         </table>
       </section>
 
-      <section id="food-search" class="hidden">
+      <form id="food-search" class="hidden">
         <h3>Search for food</h3>
-        <form id="search-food">
-          <div class="label-input">
-            <label>Food name</label>
-            <input name="query" required type="text">
-          </div>
-          <input type="submit" value="Search">
-        </form>
-      </section>
+        <div class="label-input">
+          <label>Food name</label>
+          <input name="query" required type="text">
+        </div>
+        <input type="submit" value="Search">
+      </form>
 
-      <section id="create-food" class="hidden">
+      <form id="create-food" class="hidden">
         <h3>Create food</h3>
-        <form id="create-food">
-          <div class="label-input">
-            <label>Food name</label>
-            <input name="name" required type="text">
-          </div>
-          <div class="label-input">
-            <label>Serving size</label>
-            <input name="servingSize" required type="number" min="0">
-          </div>
-          <div class="label-input">
-            <label>Unit - <em>optional</em></label>
-            <input name="unit" type="text" value="g">
-          </div>
-          <div class="label-input">
-            <label>Calories</label>
-            <input name="calories" required type="number" min="0">
-          </div>
+        <div class="label-input">
+          <label>Food name</label>
+          <input name="name" required type="text">
+        </div>
+        <div class="label-input">
+          <label>Serving size</label>
+          <input name="servingSize" required type="number" min="0">
+        </div>
+        <div class="label-input">
+          <label>Unit - <em>optional</em></label>
+          <input name="unit" type="text" value="g">
+        </div>
+        <div class="label-input">
+          <label>Calories</label>
+          <input name="calories" required type="number" min="0">
+        </div>
+        <input type="submit" value="Create food">
+      </form>
 
-          <input type="submit" value="Create food">
-        </form>
-      </section>
-
-      <section id="add-calories" class="hidden">
+      <form id="add-calories" class="hidden">
         <h3>Add calories</h3>
-        <form>
-          <div class="label-input">
-            <label>Calories</label>
-            <input name="calories" required type="number" min="0">
-          </div>
-          <div class="label-input">
-            <label>Note - <em>optional</em></label>
-            <input name="note" type="text">
-          </div>
-          <input type="submit" value="Add calories">
-        </form>
-      </section>
-
+        <div class="label-input">
+          <label>Calories</label>
+          <input name="calories" required type="number" min="0">
+        </div>
+        <div class="label-input">
+          <label>Note - <em>optional</em></label>
+          <input name="note" type="text">
+        </div>
+        <input type="submit" value="Add calories">
+      </form>
     </article>
   </main>
 

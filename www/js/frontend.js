@@ -30,25 +30,40 @@ function initializeHeader(date) {
   });
 }
 
-function initializeDiary() {
+function initializeDiary(database) {
   let addToDiary = document.getElementById("add-to-diary-button");
   let diaryOptions = document.getElementById("diary-options");
+
+  let openRecentFoods = document.getElementById("open-recent-foods");
+  let recentFoods = document.getElementById("recent-foods");
+  let openFoodSearch = document.getElementById("open-food-search");
+  let foodSearch = document.getElementById("food-search");
+  let openCreateFood = document.getElementById("open-create-food");
+  let createFood = document.getElementById("create-food");
+  let openAddCalories = document.getElementById("open-add-calories");
+  let addCalories = document.getElementById("add-calories");
+
   let panelOpen = undefined;
 
-  addToDiary.addEventListener("click", (_event) => {
-    let diaryOptionsHidden = diaryOptions.classList.toggle("hidden");
-    if (diaryOptionsHidden) {
-      console.warn("Reset the diary option panels.");
+  function close(element) {
+    element.classList.toggle("hidden", true);
+  }
+
+  function closeOpenPanel() {
+    if (panelOpen.tagName === "FORM") {
+      panelOpen.reset();
     }
-  });
+    close(panelOpen);
+    panelOpen = undefined;
+  }
 
-
+  // XXX suspicious code
   function buttonOpensPanel({ button, panel }) {
     button.addEventListener("click", (_event) => {
       let hidden = panel.classList.toggle("hidden");
 
-      if (panelOpen !== undefined) {
-        panelOpen.classList.toggle("hidden", true);
+      if (panelOpen !== undefined && panelOpen !== panel) {
+        closeOpenPanel();
       }
 
       if (hidden) {
@@ -59,19 +74,40 @@ function initializeDiary() {
     });
   }
 
-  let openRecentFoods = document.getElementById("open-recent-foods");
-  let recentFoods = document.getElementById("recent-foods");
+  addToDiary.addEventListener("click", (_event) => {
+    let diaryOptionsHidden = diaryOptions.classList.toggle("hidden");
+    if (diaryOptionsHidden) {
+      if (panelOpen !== undefined) {
+        closeOpenPanel();
+      }
+    }
+  });
+
   buttonOpensPanel({ button: openRecentFoods, panel: recentFoods });
-
-  let openFoodSearch = document.getElementById("open-food-search");
-  let foodSearch = document.getElementById("food-search");
   buttonOpensPanel({ button: openFoodSearch, panel: foodSearch });
-
-  let openCreateFood = document.getElementById("open-create-food");
-  let createFood = document.getElementById("create-food");
   buttonOpensPanel({ button: openCreateFood, panel: createFood });
-
-  let openAddCalories = document.getElementById("open-add-calories");
-  let addCalories = document.getElementById("add-calories");
   buttonOpensPanel({ button: openAddCalories, panel: addCalories });
+
+  // Handle recentFoods
+
+
+  handleSubmitEvent(foodSearch, (values) => {
+    console.log(values);
+  });
+
+  handleSubmitEvent(createFood, async (values) => {
+    try {
+      convertPropertyToNumber({ object: values, property: "calories" });
+      convertPropertyToNumber({ object: values, property: "servingSize" });
+      await database.food.create(values);
+      createFood.reset();
+      addToDiary.click();
+    } catch(error) {
+      console.log("Failed to create food.");
+    }
+  });
+
+  handleSubmitEvent(addCalories, (values) => {
+    console.log(values);
+  });
 }

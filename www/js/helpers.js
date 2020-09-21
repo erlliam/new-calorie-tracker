@@ -16,7 +16,7 @@ function arraysMatchAnyOrder(arrayOne, arrayTwo) {
   return true;
 }
 
-function handleSubmitEvent({ form, callback }) {
+function handleSubmitEvent(form, callback) {
   if (form.tagName !== "FORM") {
     throw TypeError("form parameter is not a form.");
   } else if (typeof callback !== "function") {
