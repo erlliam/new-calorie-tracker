@@ -88,46 +88,59 @@ function initializeDiary(database, date) {
   togglePanel(toggleFoodSearch, foodSearch);
   togglePanel(toggleCreateFood, createFood);
   togglePanel(toggleAddCalories, addCalories);
-/*
-  handleSubmitEvent(foodSearch, (values) => {
+
+  // XXX make it possible to add foods to diary
+
+  recentFoods.addEventListener("click", (event) => {
+    if (event.target.tagName === "TD") {
+      let tableRow = event.target.parentElement;
+      // if (!tableRow.hasAttribute("data-food-id")) { return; }
+      let foodId = tableRow.getAttribute("data-food-id");
+      // convert foodId to int
+
+      console.log(tableRow);
+      console.log(foodId);
+    }
+  });
+
+  handleSubmitEvent(foodSearch, async (values) => {
+    let query = values.query;
+
     console.log(values);
   });
 
   handleSubmitEvent(createFood, async (values) => {
+    if (!convertPropertyToNumber({ object: values, property: "calories" }) ||
+        !convertPropertyToNumber({ object: values, property: "servingSize" })) {
+      // XXX Not sure how to exit.
+      return;
+    }
+
+    console.log(values);
+/*
     try {
-      convertPropertyToNumber({ object: values, property: "calories" });
-      convertPropertyToNumber({ object: values, property: "servingSize" });
-
       await database.food.create(values);
-
       createFood.reset();
       addToDiary.click();
-    } catch(error) {
-      console.log("Failed to create food.");
-    }
+    } catch(error) { console.log("Failed to create food."); }
+*/
   });
 
   handleSubmitEvent(addCalories, async (values) => {
+    if (!convertPropertyToNumber({ object: values, property: "calories" })) {
+      // XXX Not sure how to exit.
+      return;
+    }
+
+    console.log(values);
+/*
     try {
-      console.log(values);
-      convertPropertyToNumber({ object: values, property: "calories" });
-      
-      let diaryEntry = {
-        dateString: "9/11/2020",
-        foodKey: 1,
-        servingSize: values.calories
-      };
-
+      let diaryEntry = { dateString: "9/11/2020", foodKey: 1, servingSize: values.calories };
       console.log(diaryEntry);
-
-
       // await database.food.create(values);
-
       // createFood.reset();
       // addToDiary.click();
-    } catch(error) {
-      console.log("Failed to create food.");
-    }
-  });
+    } catch(error) { console.log("Failed to create food."); }
 */
+  });
 }
