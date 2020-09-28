@@ -8,5 +8,5 @@
   await database.ready;
 
   initializeHeader(date);
-  initializeDiary(database);
+  initializeDiary(database, date);
 })();

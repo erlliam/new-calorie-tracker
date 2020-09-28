@@ -12,85 +12,83 @@ function initializeHeader(date) {
     date.setTime(time + (days * (1000 * 60 * 60 * 24)));
   }
 
-  function changeDateUpdateText(days) {
+  function changeDateAndUpdateText(days) {
     changeDate(days);
     updateText();
+  }
+
+  function showCalender() {
+    console.warn("Feature not implemented.");
   }
 
   updateText();
 
   diaryDate.addEventListener("click", (_event) => {
-    console.warn("Implement a pop-up calender.");
+    showCalender();
   });
+
   diaryDateBack.addEventListener("click", (_event) => {
-    changeDateUpdateText(-1);
+    changeDateAndUpdateText(-1);
   });
+
   diaryDateForward.addEventListener("click", (_event) => {
-    changeDateUpdateText(1);
+    changeDateAndUpdateText(1);
   });
 }
 
-function initializeDiary(database) {
-  let addToDiary = document.getElementById("add-to-diary-button");
+function initializeDiary(database, date) {
+  let toggleDiaryOptions = document.getElementById("toggle-diary-options");
   let diaryOptions = document.getElementById("diary-options");
 
-  let openRecentFoods = document.getElementById("open-recent-foods");
+  let toggleRecentFoods = document.getElementById("toggle-recent-foods");
   let recentFoods = document.getElementById("recent-foods");
-  let openFoodSearch = document.getElementById("open-food-search");
+  let toggleFoodSearch = document.getElementById("toggle-food-search");
   let foodSearch = document.getElementById("food-search");
-  let openCreateFood = document.getElementById("open-create-food");
+  let toggleCreateFood = document.getElementById("toggle-create-food");
   let createFood = document.getElementById("create-food");
-  let openAddCalories = document.getElementById("open-add-calories");
+  let toggleAddCalories = document.getElementById("toggle-add-calories");
   let addCalories = document.getElementById("add-calories");
 
-  let panelOpen = undefined;
+  let openedPanel = null;
 
-  function close(element) {
-    element.classList.toggle("hidden", true);
-  }
+  function closeOpenedPanel() {
+    openedPanel.classList.toggle("hidden", true);
 
-  function closeOpenPanel() {
-    if (panelOpen.tagName === "FORM") {
-      panelOpen.reset();
+    if (openedPanel.tagName === "FORM") {
+      openedPanel.reset();
     }
-    close(panelOpen);
-    panelOpen = undefined;
+
+    openedPanel = null;
   }
 
-  // XXX suspicious code
-  function buttonOpensPanel({ button, panel }) {
+  function togglePanel(button, panel) {
     button.addEventListener("click", (_event) => {
-      let hidden = panel.classList.toggle("hidden");
-
-      if (panelOpen !== undefined && panelOpen !== panel) {
-        closeOpenPanel();
-      }
-
-      if (hidden) {
-        panelOpen = undefined;
+      let isHidden = panel.classList.toggle("hidden");
+      if (isHidden) {
+        openedPanel = null;
       } else {
-        panelOpen = panel;
+        if (openedPanel !== null) {
+          closeOpenedPanel();
+        }
+        openedPanel = panel;
       }
     });
   }
 
-  addToDiary.addEventListener("click", (_event) => {
-    let diaryOptionsHidden = diaryOptions.classList.toggle("hidden");
-    if (diaryOptionsHidden) {
-      if (panelOpen !== undefined) {
-        closeOpenPanel();
+  toggleDiaryOptions.addEventListener("click", (_event) => {
+    let isHidden = diaryOptions.classList.toggle("hidden");
+    if (isHidden) {
+      if (openedPanel !== null) {
+        closeOpenedPanel();
       }
     }
   });
 
-  buttonOpensPanel({ button: openRecentFoods, panel: recentFoods });
-  buttonOpensPanel({ button: openFoodSearch, panel: foodSearch });
-  buttonOpensPanel({ button: openCreateFood, panel: createFood });
-  buttonOpensPanel({ button: openAddCalories, panel: addCalories });
-
-  // Handle recentFoods
-
-
+  togglePanel(toggleRecentFoods, recentFoods);
+  togglePanel(toggleFoodSearch, foodSearch);
+  togglePanel(toggleCreateFood, createFood);
+  togglePanel(toggleAddCalories, addCalories);
+/*
   handleSubmitEvent(foodSearch, (values) => {
     console.log(values);
   });
@@ -99,7 +97,9 @@ function initializeDiary(database) {
     try {
       convertPropertyToNumber({ object: values, property: "calories" });
       convertPropertyToNumber({ object: values, property: "servingSize" });
+
       await database.food.create(values);
+
       createFood.reset();
       addToDiary.click();
     } catch(error) {
@@ -107,7 +107,27 @@ function initializeDiary(database) {
     }
   });
 
-  handleSubmitEvent(addCalories, (values) => {
-    console.log(values);
+  handleSubmitEvent(addCalories, async (values) => {
+    try {
+      console.log(values);
+      convertPropertyToNumber({ object: values, property: "calories" });
+      
+      let diaryEntry = {
+        dateString: "9/11/2020",
+        foodKey: 1,
+        servingSize: values.calories
+      };
+
+      console.log(diaryEntry);
+
+
+      // await database.food.create(values);
+
+      // createFood.reset();
+      // addToDiary.click();
+    } catch(error) {
+      console.log("Failed to create food.");
+    }
   });
+*/
 }
