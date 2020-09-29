@@ -43,7 +43,6 @@ function getDateString(date) {
   });
 }
 
-
 function convertPropertyToNumber({ object, property }) {
   let value = object[property];
   if (typeof value === "number") return true;

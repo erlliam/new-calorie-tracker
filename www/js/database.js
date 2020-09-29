@@ -147,6 +147,24 @@ class DatabaseFood {
     return await result;
   }
 
+  async search({ query }) {
+    let resolveResult;
+    let result = new Promise((resolve) => { resolveResult = resolve; });
+
+    await this._database.transactReadOnly({ storeNames: ["food"] },
+      (stores) => {
+        let index = stores.food.index("name");
+        let request = index.getAll(query);
+
+        request.addEventListener("success", (_event) => {
+          resolveResult(request.result);
+        });
+      }
+    );
+
+    return await result;
+  }
+
   async exists({ key }) {
     return await this.query({ key: key }) !== undefined;
   }

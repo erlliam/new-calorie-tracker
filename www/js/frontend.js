@@ -109,15 +109,21 @@ function initializeDiaryOptions(database, date) {
     initializeRecentFoods();
 
     recentFoods.addEventListener("click", (event) => {
-      if (event.target.tagName === "TD") {
-        let tableRow = event.target.parentElement;
-        // if (!tableRow.hasAttribute("data-food-id")) { return; }
-        let foodId = tableRow.getAttribute("data-food-id");
-        // convert foodId to int
+      if (event.target.tagName !== "TD") return;
 
-        console.log(tableRow);
-        console.log(foodId);
-      }
+      let tableRow = event.target.parentElement;
+      if (!tableRow.hasAttribute("data-food-id")) return;
+
+      let values = { foodId: tableRow.getAttribute("data-food-id") }
+      if (!convertPropertyToNumber({ object: values, property: "foodId" })) return;
+
+      // search up the foodId
+      // create a diary entry
+      // this entry pop up will have pre filled values
+      // the user can edit these values
+
+      console.log(values);
+      console.warn("Finish recentFoods eventListener");
     });
 
     handleSubmitEvent(foodSearch, async (values) => {
@@ -125,10 +131,10 @@ function initializeDiaryOptions(database, date) {
       let query = values.query;
 
       try {
-        await database.food.search(values);
+        let results = await database.food.search({ query: query });
         foodSearch.reset();
         toggleDiaryOptions.click();
-        console.log("Search for:", query);
+        console.log("Search for:", query, "Results:", results);
       } catch(error) {
         console.log("Failed to search for:", query);
         throw error;
@@ -140,7 +146,6 @@ function initializeDiaryOptions(database, date) {
       if (!convertPropertyToNumber({ object: values, property: "calories" }) ||
           !convertPropertyToNumber({ object: values, property: "servingSize" })) {
         console.log("Failed to convert calories/servingSize to number:", values);
-        // XXX Not sure how to exit.
         return;
       }
 
@@ -158,7 +163,6 @@ function initializeDiaryOptions(database, date) {
     handleSubmitEvent(addCalories, async (values) => {
       // XXX show users the messages in console.log
       if (!convertPropertyToNumber({ object: values, property: "calories" })) {
-        // XXX Not sure how to exit.
         console.log("Failed to convert calories to number:", values);
         return;
       }
