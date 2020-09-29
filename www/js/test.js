@@ -1,4 +1,3 @@
-
 (async () => {
   const DATABASE_NAME = "Calorie Tracker";
   let foodExample = { name: "Potato", servingSize: 1, unit: "g", calories: 100 };

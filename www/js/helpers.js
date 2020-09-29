@@ -43,6 +43,14 @@ function getDateString(date) {
   });
 }
 
+function getNumericDateString(date) {
+  return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+  });
+}
+
 function convertPropertyToNumber({ object, property }) {
   let value = object[property];
   if (typeof value === "number") return true;

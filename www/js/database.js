@@ -194,6 +194,18 @@ class DatabaseDiary {
     );
   }
 
+  async addCalories(data) {
+    if (!validDateString(data.dateString) || typeof data.calories !== "number") {
+      throw TypeError("invalid calorie entry");
+    }
+
+    await this._database.transactReadWrite({ storeNames: ["diary"] },
+      (stores) => {
+        stores.diary.add(data);
+      }
+    );
+  }
+
   async edit({ key, data }) {
     if (!(await this._dataValidator(data))) {
       throw TypeError("invalid diary entry");

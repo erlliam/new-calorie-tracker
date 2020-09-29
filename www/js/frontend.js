@@ -112,10 +112,18 @@ function initializeDiaryOptions(database, date) {
       if (event.target.tagName !== "TD") return;
 
       let tableRow = event.target.parentElement;
-      if (!tableRow.hasAttribute("data-food-id")) return;
+      if (!tableRow.hasAttribute("data-id") ||
+          !tableRow.hasAttribute("data-serving-size")) return;
 
-      let values = { foodId: tableRow.getAttribute("data-food-id") }
-      if (!convertPropertyToNumber({ object: values, property: "foodId" })) return;
+      let values = {
+        dateString: getNumericDateString(date),
+        foodId: tableRow.getAttribute("data-food-id"),
+        servingSize: tableRow.getAttribute("data-serving-size")
+      }
+
+      if (!convertPropertyToNumber({ object: values, property: "foodId" }) ||
+          !convertPropertyToNumber({ object: values, property: "servingSize" }))
+        return;
 
       // search up the foodId
       // create a diary entry
@@ -135,6 +143,7 @@ function initializeDiaryOptions(database, date) {
         foodSearch.reset();
         toggleDiaryOptions.click();
         console.log("Search for:", query, "Results:", results);
+        // XXX display this to the DOM?
       } catch(error) {
         console.log("Failed to search for:", query);
         throw error;
@@ -166,6 +175,8 @@ function initializeDiaryOptions(database, date) {
         console.log("Failed to convert calories to number:", values);
         return;
       }
+
+      values.dateString = getNumericDateString(date);
 
       try {
         await database.diary.addCalories(values);
