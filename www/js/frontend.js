@@ -18,25 +18,37 @@ function initializeHeader(date) {
   }
 
   function showCalender() {
-    console.warn("Feature not implemented.");
+    console.warn("Implement header's calender");
   }
 
-  updateText();
+  {
+    updateText();
 
-  diaryDate.addEventListener("click", (_event) => {
-    showCalender();
-  });
+    diaryDate.addEventListener("click", (_event) => {
+      showCalender();
+    });
 
-  diaryDateBack.addEventListener("click", (_event) => {
-    changeDateAndUpdateText(-1);
-  });
+    diaryDateBack.addEventListener("click", (_event) => {
+      changeDateAndUpdateText(-1);
+    });
 
-  diaryDateForward.addEventListener("click", (_event) => {
-    changeDateAndUpdateText(1);
-  });
+    diaryDateForward.addEventListener("click", (_event) => {
+      changeDateAndUpdateText(1);
+    });
+  }
 }
 
-function initializeDiary(database, date) {
+function initializeOverview() {
+  let toggleOverviewOptions = document.getElementById("toggle-overview-options");
+  let overviewOptions = undefined;
+  console.warn("Implement initializeOverview()");
+}
+function initializeDiary() {
+  let diary = document.getElementById("diary");
+  console.warn("Implement initializeDiary()");
+}
+
+function initializeDiaryOptions(database, date) {
   let toggleDiaryOptions = document.getElementById("toggle-diary-options");
   let diaryOptions = document.getElementById("diary-options");
 
@@ -75,72 +87,91 @@ function initializeDiary(database, date) {
     });
   }
 
-  toggleDiaryOptions.addEventListener("click", (_event) => {
-    let isHidden = diaryOptions.classList.toggle("hidden");
-    if (isHidden) {
-      if (openedPanel !== null) {
-        closeOpenedPanel();
+  function initializeRecentFoods() {
+    console.warn("Implement initializeRecentFoods()");
+  }
+
+  {
+    toggleDiaryOptions.addEventListener("click", (_event) => {
+      let isHidden = diaryOptions.classList.toggle("hidden");
+      if (isHidden) {
+        if (openedPanel !== null) {
+          closeOpenedPanel();
+        }
       }
-    }
-  });
+    });
 
-  togglePanel(toggleRecentFoods, recentFoods);
-  togglePanel(toggleFoodSearch, foodSearch);
-  togglePanel(toggleCreateFood, createFood);
-  togglePanel(toggleAddCalories, addCalories);
+    togglePanel(toggleRecentFoods, recentFoods);
+    togglePanel(toggleFoodSearch, foodSearch);
+    togglePanel(toggleCreateFood, createFood);
+    togglePanel(toggleAddCalories, addCalories);
 
-  // XXX make it possible to add foods to diary
+    initializeRecentFoods();
 
-  recentFoods.addEventListener("click", (event) => {
-    if (event.target.tagName === "TD") {
-      let tableRow = event.target.parentElement;
-      // if (!tableRow.hasAttribute("data-food-id")) { return; }
-      let foodId = tableRow.getAttribute("data-food-id");
-      // convert foodId to int
+    recentFoods.addEventListener("click", (event) => {
+      if (event.target.tagName === "TD") {
+        let tableRow = event.target.parentElement;
+        // if (!tableRow.hasAttribute("data-food-id")) { return; }
+        let foodId = tableRow.getAttribute("data-food-id");
+        // convert foodId to int
 
-      console.log(tableRow);
-      console.log(foodId);
-    }
-  });
+        console.log(tableRow);
+        console.log(foodId);
+      }
+    });
 
-  handleSubmitEvent(foodSearch, async (values) => {
-    let query = values.query;
+    handleSubmitEvent(foodSearch, async (values) => {
+      // XXX show users the messages in console.log
+      let query = values.query;
 
-    console.log(values);
-  });
+      try {
+        await database.food.search(values);
+        foodSearch.reset();
+        toggleDiaryOptions.click();
+        console.log("Search for:", query);
+      } catch(error) {
+        console.log("Failed to search for:", query);
+        throw error;
+      }
+    });
 
-  handleSubmitEvent(createFood, async (values) => {
-    if (!convertPropertyToNumber({ object: values, property: "calories" }) ||
-        !convertPropertyToNumber({ object: values, property: "servingSize" })) {
-      // XXX Not sure how to exit.
-      return;
-    }
+    handleSubmitEvent(createFood, async (values) => {
+      // XXX show users the messages in console.log
+      if (!convertPropertyToNumber({ object: values, property: "calories" }) ||
+          !convertPropertyToNumber({ object: values, property: "servingSize" })) {
+        console.log("Failed to convert calories/servingSize to number:", values);
+        // XXX Not sure how to exit.
+        return;
+      }
 
-    console.log(values);
-/*
-    try {
-      await database.food.create(values);
-      createFood.reset();
-      addToDiary.click();
-    } catch(error) { console.log("Failed to create food."); }
-*/
-  });
+      try {
+        await database.food.create(values);
+        createFood.reset();
+        toggleDiaryOptions.click();
+        console.log("Food created:", values);
+      } catch(error) {
+        console.log("Failed to create food:", values);
+        throw error;
+      }
+    });
 
-  handleSubmitEvent(addCalories, async (values) => {
-    if (!convertPropertyToNumber({ object: values, property: "calories" })) {
-      // XXX Not sure how to exit.
-      return;
-    }
+    handleSubmitEvent(addCalories, async (values) => {
+      // XXX show users the messages in console.log
+      if (!convertPropertyToNumber({ object: values, property: "calories" })) {
+        // XXX Not sure how to exit.
+        console.log("Failed to convert calories to number:", values);
+        return;
+      }
 
-    console.log(values);
-/*
-    try {
-      let diaryEntry = { dateString: "9/11/2020", foodKey: 1, servingSize: values.calories };
-      console.log(diaryEntry);
-      // await database.food.create(values);
-      // createFood.reset();
-      // addToDiary.click();
-    } catch(error) { console.log("Failed to create food."); }
-*/
-  });
+      try {
+        await database.diary.addCalories(values);
+        addCalories.reset();
+        toggleDiaryOptions.click();
+        console.log("Calories added:", values);
+      } catch(error) {
+        console.log("Failed to add calories:", values);
+        throw error;
+      }
+    });
+  }
 }
