@@ -58,7 +58,7 @@ function displayEntryInDocument(diary, entry) {
     // XXX calculate calories based on servingSize and foodId.
   } else if (entry.values.hasOwnProperty("note")) {
     foodName.textContent = entry.values.note;
-    foodServingSize.textContent = "(added calories)";
+    foodServingSize.textContent = "(added\u00A0calories)";
     foodCalories.textContent = entry.values.calories;
   } else {
     foodName.textContent = "WTF error man";
@@ -79,6 +79,32 @@ async function initializeDiary(database, date) {
   for (const entry of entries) {
     displayEntryInDocument(diary, entry);
   }
+
+  diary.addEventListener("click", (event) => {
+    if (event.target.tagName !== "TD") return;
+
+    let tableRow = event.target.parentElement;
+    if (!tableRow.hasAttribute("data-id") ||
+        !tableRow.hasAttribute("data-serving-size")) return;
+
+    let values = {
+      dateString: getNumericDateString(date),
+      foodId: tableRow.getAttribute("data-food-id"),
+      servingSize: tableRow.getAttribute("data-serving-size")
+    }
+
+    if (!convertPropertyToNumber({ object: values, property: "foodId" }) ||
+        !convertPropertyToNumber({ object: values, property: "servingSize" }))
+      return;
+
+    // search up the foodId
+    // create a diary entry
+    // this entry pop up will have pre filled values
+    // the user can edit these values
+
+    console.log(values);
+    console.warn("Finish recentFoods eventListener");
+  });
 }
 
 function initializeDiaryOptions(database, date) {
