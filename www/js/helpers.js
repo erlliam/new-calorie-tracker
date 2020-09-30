@@ -1,3 +1,5 @@
+"use strict";
+
 function setTextTimeout(element, text, delay) {
   element.textContent = text;
   window.setTimeout(() => {

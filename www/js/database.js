@@ -1,3 +1,5 @@
+"use strict";
+
 // XXX refactor
 // create/edit/remove functions seem to be identical.
 // The only differences are the storeNames used and the
@@ -244,7 +246,7 @@ class DatabaseDiary {
         request.addEventListener("success", (_event) => {
           let cursor = request.result;
           if (cursor) {
-            entriesArray.push({ key: cursor.primaryKey, value: cursor.value });
+            entriesArray.push({ key: cursor.primaryKey, values: cursor.value });
             cursor.continue();
           } else {
             resolveResult(entriesArray);

@@ -1,3 +1,5 @@
+"use strict";
+
 function initializeHeader(date) {
   let diaryDate = document.getElementById("diary-date");
   let diaryDateBack = document.getElementById("diary-date-back");
@@ -43,9 +45,40 @@ function initializeOverview() {
   let overviewOptions = undefined;
   console.warn("Implement initializeOverview()");
 }
-function initializeDiary() {
+
+function displayEntryInDocument(diary, entry) {
+  let foodContainer = document.createElement("tr");
+  let foodName = document.createElement("td");
+  let foodServingSize = document.createElement("td");
+  let foodCalories = document.createElement("td");
+  if (entry.values.hasOwnProperty("name")) {
+    foodName.textContent = entry.values.name;
+    foodServingSize.textContent = `${entry.values.servingSize} ${entry.values.unit}`;
+    foodCalories.textContent = 0;
+    // XXX calculate calories based on servingSize and foodId.
+  } else if (entry.values.hasOwnProperty("note")) {
+    foodName.textContent = entry.values.note;
+    foodServingSize.textContent = "(added calories)";
+    foodCalories.textContent = entry.values.calories;
+  } else {
+    foodName.textContent = "WTF error man";
+  }
+
+  foodContainer.classList.add("food");
+  foodContainer.setAttribute("data-id", entry.key);
+  foodContainer.append(foodName, foodServingSize, foodCalories);
+  diary.append(foodContainer);
+}
+
+async function initializeDiary(database, date) {
   let diary = document.getElementById("diary");
-  console.warn("Implement initializeDiary()");
+
+  let dateString = getNumericDateString(date);
+  let entries = await database.diary.query({ dateString: dateString });
+  console.log(entries);
+  for (const entry of entries) {
+    displayEntryInDocument(diary, entry);
+  }
 }
 
 function initializeDiaryOptions(database, date) {

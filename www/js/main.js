@@ -1,3 +1,5 @@
+"use strict";
+
 (async () => {
   const DATABASE_NAME = "Calorie Tracker";
 
@@ -9,6 +11,6 @@
 
   initializeHeader(date);
   initializeOverview();
-  initializeDiary();
+  initializeDiary(database, date);
   initializeDiaryOptions(database, date);
 })();
