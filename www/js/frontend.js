@@ -5,10 +5,12 @@ class PanelPopUp {
     this._databaseDiary = databaseDiary;
     this._date = date;
     this._container = document.getElementById("panel-pop-up");
-    this._init();
+    this._addFoodForm = document.getElementById("add-food-form");
+
+    this._addEventListeners();
   }
 
-  _init() {
+  _addEventListeners() {
     let panelExit = document.getElementById("panel-pop-up-exit");
 
     this._container.addEventListener("click", (event) => {
@@ -31,66 +33,82 @@ class PanelPopUp {
 
       this._panelReject();
     });
+
+    handleSubmitEvent(this._addFoodForm, this._addFoodFormEvent);
+  }
+
+  async _addFoodFormEvent(values) {
+    if (!convertPropertyToNumber({ object: values, property: "servings" }) ||
+        !convertPropertyToNumber({ object: values, property: "foodKey" })) {
+      this._panelReject();
+      return;
+    }
+
+    console.log(values);
+
+    let servingsConsumed;
+    if (values.servingSize === "default") {
+      servingsConsumed = values.servings;
+    } else if (values.servingSize === "single") {
+      servingsConsumed = values.servings / food.servingSize;
+    }
+
+    // let caloriesConsumed = servingsConsumed * food.calories;
+
+    try {
+      await this._databaseDiary.create({
+        dateString: getNumericDateString(this._date),
+        foodKey: food.foodKey,
+        servingSize: servingsConsumed
+      });
+      this._panelResolve();
+    } catch(error) {
+      this._panelReject();
+      throw error;
+    }
+  }
+
+  _hide() {
+    this._container.classList.toggle("hidden", true);
+  }
+
+  _show() {
+    this._container.classList.toggle("hidden", false);
   }
 
   _panelReject() {
-    this._container.classList.toggle("hidden", true);
+    this._hide();
     this._promiseReject();
   }
 
   _panelResolve() {
-    this._container.classList.toggle("hidden", true);
+    this._hide();
     this._promiseResolve();
+  }
+
+  _updateFoodPopUpText(food) {
+    let foodName = document.getElementById("add-food-name");
+    let foodServingSize = document.getElementById("add-food-serving-size");
+    let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
+    let foodKey = document.getElementById("add-food-key");
+
+    foodName.textContent = food.name;
+    foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
+    foodServingSizeSingle.textContent = `1 ${food.unit}`;
+    foodKey.setAttribute("value", food.foodKey);
+  }
+
+  _showAddFoodPopUp(food) {
+    this._updateFoodPopUpText(food);
+    this._addFoodForm.classList.toggle("hidden", false);
   }
 
   addFood(food, promise, promiseResolve, promiseReject) {
     this._promiseReject = promiseReject;
     this._promiseResolve = promiseResolve;
 
-    this._container.classList.toggle("hidden", false);
-
-    let foodName = document.getElementById("add-food-name");
-    let foodServingSize = document.getElementById("add-food-serving-size");
-    let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
-    foodName.textContent = food.name;
-    foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
-    foodServingSizeSingle.textContent = `1 ${food.unit}`;
-
-    let foodForm = document.getElementById("add-food-form");
-    foodForm.classList.toggle("hidden", false);
-
-    handleSubmitEvent(foodForm, async (values) => {
-      if (!convertPropertyToNumber({ object: values, property: "servings" })) {
-        this._panelReject();
-        return;
-      }
-
-      console.log(values);
-
-      let servingsConsumed;
-
-      if (values.servingSize === "default") {
-        servingsConsumed = values.servings;
-      } else if (values.servingSize === "single") {
-        servingsConsumed = values.servings / food.servingSize;
-      }
-
-      let caloriesConsumed = servingsConsumed * food.calories;
-
-      try {
-        await this._databaseDiary.create({
-          dateString: getNumericDateString(this._date),
-          foodKey: food.foodKey,
-          servingSize: servingsConsumed
-        });
-
-        console.log("we won");
-        this._panelResolve();
-      } catch(error) {
-        console.log(error);
-        this._panelReject();
-      }
-    });
+    this._show();
+    this._showAddFoodPopUp(food);
   }
 }
 
