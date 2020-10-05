@@ -167,7 +167,7 @@ class DatabaseFood {
     return await result;
   }
 
-  async exists({ key }) {
+  async exists(key) {
     return await this.query({ key: key }) !== undefined;
   }
 }

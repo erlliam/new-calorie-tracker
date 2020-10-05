@@ -1,7 +1,9 @@
 "use strict";
 
 class PanelPopUp {
-  constructor() {
+  constructor(databaseDiary, date) {
+    this._databaseDiary = databaseDiary;
+    this._date = date;
     this._container = document.getElementById("panel-pop-up");
     this._init();
   }
@@ -50,42 +52,47 @@ class PanelPopUp {
     let foodName = document.getElementById("add-food-name");
     let foodServingSize = document.getElementById("add-food-serving-size");
     let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
-    foodName.textContent = "HELLO";
-    foodServingSize.textContent = "100 g";
-    foodServingSizeSingle.textContent = "1 g";
+    foodName.textContent = food.name;
+    foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
+    foodServingSizeSingle.textContent = `1 ${food.unit}`;
 
     let foodForm = document.getElementById("add-food-form");
     foodForm.classList.toggle("hidden", false);
 
-    handleSubmitEvent(foodForm, (values) => {
-      if (true) {
+    handleSubmitEvent(foodForm, async (values) => {
+      if (!convertPropertyToNumber({ object: values, property: "servings" })) {
+        this._panelReject();
+        return;
+      }
+
+      console.log(values);
+
+      let servingsConsumed;
+
+      if (values.servingSize === "default") {
+        servingsConsumed = values.servings;
+      } else if (values.servingSize === "single") {
+        servingsConsumed = values.servings / food.servingSize;
+      }
+
+      let caloriesConsumed = servingsConsumed * food.calories;
+
+      try {
+        await this._databaseDiary.create({
+          dateString: getNumericDateString(this._date),
+          foodKey: food.foodKey,
+          servingSize: servingsConsumed
+        });
+
+        console.log("we won");
         this._panelResolve();
-      } else {
+      } catch(error) {
+        console.log(error);
         this._panelReject();
       }
-      // if ok resolve shit
     });
   }
 }
-
-let panelPopUp = new PanelPopUp();
-
-let promiseResolve;
-let promiseReject;
-let promise = new Promise((resolve, reject) => {
-  promiseResolve = resolve;
-  promiseReject = reject;
-});
-
-panelPopUp.addFood({}, promise, promiseResolve, promiseReject);
-
-promise.then(() => {
-  console.log("Resolved ok.");
-});
-
-promise.catch(() => {
-  console.log("Rejected ok");
-});
 
 function initializeHeader(date) {
   let diaryDate = document.getElementById("diary-date");
@@ -138,16 +145,16 @@ function displayEntryInDocument(diary, entry) {
   let foodName = document.createElement("td");
   let foodServingSize = document.createElement("td");
   let foodCalories = document.createElement("td");
-  if (entry.values.hasOwnProperty("name")) {
-    foodName.textContent = entry.values.name;
-    foodServingSize.textContent = `${entry.values.servingSize} ${entry.values.unit}`;
-    foodCalories.textContent = 0;
-    // XXX calculate calories based on servingSize and foodId.
-  } else if (entry.values.hasOwnProperty("note")) {
+
+  if (entry.values.hasOwnProperty("note")) {
     foodName.textContent = entry.values.note;
     foodServingSize.textContent = "(added\u00A0calories)";
     foodCalories.textContent = entry.values.calories;
   } else {
+    foodName.textContent = entry.values.name;
+    foodServingSize.textContent = `${entry.values.servingSize} ${entry.values.unit}`;
+    foodCalories.textContent = 0;
+    // XXX calculate calories based on servingSize and foodId.
     foodName.textContent = "WTF error man";
   }
 
@@ -334,5 +341,26 @@ function initializeDiaryOptions(database, date) {
         throw error;
       }
     });
+
+              let panelPopUp = new PanelPopUp(database.diary, date);
+
+              let promiseResolve;
+              let promiseReject;
+              let promise = new Promise((resolve, reject) => {
+                promiseResolve = resolve;
+                promiseReject = reject;
+              });
+
+              let food = {"foodKey":3,"name":"Aqua lentils","servingSize":58,"unit":"g","calories":102}
+
+              panelPopUp.addFood(food, promise, promiseResolve, promiseReject);
+
+              promise.then(() => {
+                console.log("Resolved ok.");
+              });
+
+              promise.catch(() => {
+                console.log("Rejected ok");
+              });
   }
 }

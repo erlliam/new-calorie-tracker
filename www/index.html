@@ -18,14 +18,14 @@
         </div>
         <div class="label-input">
           <label>Serving Size</label>
-          <select>
-            <option id="add-food-serving-size"></option>
-            <option id="add-food-serving-size-one"></option>
+          <select name="servingSize">
+            <option value="default" id="add-food-serving-size"></option>
+            <option value="single" id="add-food-serving-size-one"></option>
           </select>
         </div>
         <div class="label-input">
           <label>Number of Servings</label>
-          <input name="servings" required type="text">
+          <input name="servings" required type="number">
         </div>
         <input type="submit" value="Add food">
       </form>
