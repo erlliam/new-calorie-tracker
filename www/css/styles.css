@@ -1,21 +1,34 @@
-.food-panel {
+.darken-background {
   position: fixed;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.food-panel form {
+.food-panel {
   max-width: 40rem;
-  margin: 0 auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/*
+XXX
+main>article should have padding 1 rem, not margin
+
+This escaped me because the background colors are indentical
+(body and article, same background color)
+*/
+
+.food-panel form {
   background-color: #ffffff;
+  margin-left: 0;
+  padding: 1rem;
 }
 
 .food-panel h2 {
-  margin: 0;
   text-align: center;
+  margin: 0;
 }
-
 
 .hidden {
   display: none;

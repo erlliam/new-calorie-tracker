@@ -8,26 +8,30 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
-  <section class="food-panel">
-    <form>
-      <h2>Add food</h2>
-        <label>Food name</label>
-        <label>Potato</label>
-      <div class="label-input">
-        <label>Serving Size</label>
-        <select>
-          <option>100 g (default size)</option>
-          <option>1 g</option>
-        </select>
-      </div>
-      <div class="label-input">
-        <label>Number of Servings</label>
-        <input name="name" required type="text">
-      </div>
-      <button>Exit</button>
-      <button>Add food</button>
-    </form>
-  </section>
+  <div id="panel-pop-up" class="darken-background hidden">
+    <section class="food-panel">
+      <form id="add-food-form" class="hidden">
+        <h2>Add food</h2>
+        <div class="label-input">
+          <label>Food name</label>
+          <label id="add-food-name">Potato</label>
+        </div>
+        <div class="label-input">
+          <label>Serving Size</label>
+          <select>
+            <option id="add-food-serving-size"></option>
+            <option id="add-food-serving-size-one"></option>
+          </select>
+        </div>
+        <div class="label-input">
+          <label>Number of Servings</label>
+          <input name="servings" required type="text">
+        </div>
+        <input type="submit" value="Add food">
+      </form>
+    </section>
+    <button id="panel-pop-up-exit" form="">Exit</button>
+  </div>
 
   <header>
     <h1><button id="diary-date">January&nbsp;1,&nbsp;1970</button></h1>

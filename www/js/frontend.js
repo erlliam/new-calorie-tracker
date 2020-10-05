@@ -1,5 +1,92 @@
 "use strict";
 
+class PanelPopUp {
+  constructor() {
+    this._container = document.getElementById("panel-pop-up");
+    this._init();
+  }
+
+  _init() {
+    let panelExit = document.getElementById("panel-pop-up-exit");
+
+    this._container.addEventListener("click", (event) => {
+      if (event.target !== this._container) {
+        return;
+      }
+
+      this._panelReject();
+    });
+
+    panelExit.addEventListener("click", (_event) => {
+      this._panelReject();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (this._container.classList.contains("hidden") ||
+          event.code !== "Escape") {
+        return;
+      }
+
+      this._panelReject();
+    });
+  }
+
+  _panelReject() {
+    this._container.classList.toggle("hidden", true);
+    this._promiseReject();
+  }
+
+  _panelResolve() {
+    this._container.classList.toggle("hidden", true);
+    this._promiseResolve();
+  }
+
+  addFood(food, promise, promiseResolve, promiseReject) {
+    this._promiseReject = promiseReject;
+    this._promiseResolve = promiseResolve;
+
+    this._container.classList.toggle("hidden", false);
+
+    let foodName = document.getElementById("add-food-name");
+    let foodServingSize = document.getElementById("add-food-serving-size");
+    let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
+    foodName.textContent = "HELLO";
+    foodServingSize.textContent = "100 g";
+    foodServingSizeSingle.textContent = "1 g";
+
+    let foodForm = document.getElementById("add-food-form");
+    foodForm.classList.toggle("hidden", false);
+
+    handleSubmitEvent(foodForm, (values) => {
+      if (true) {
+        this._panelResolve();
+      } else {
+        this._panelReject();
+      }
+      // if ok resolve shit
+    });
+  }
+}
+
+let panelPopUp = new PanelPopUp();
+
+let promiseResolve;
+let promiseReject;
+let promise = new Promise((resolve, reject) => {
+  promiseResolve = resolve;
+  promiseReject = reject;
+});
+
+panelPopUp.addFood({}, promise, promiseResolve, promiseReject);
+
+promise.then(() => {
+  console.log("Resolved ok.");
+});
+
+promise.catch(() => {
+  console.log("Rejected ok");
+});
+
 function initializeHeader(date) {
   let diaryDate = document.getElementById("diary-date");
   let diaryDateBack = document.getElementById("diary-date-back");
