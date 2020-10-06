@@ -1,5 +1,118 @@
 "use strict";
 
+class PopUpAddFood {
+  constructor(parent) {
+    this._parent = parent;
+    this._form = document.getElementById("add-food-form");
+    this._init();
+  }
+
+  _init() {
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    handleSubmitEvent(this._form, async (values) => {
+      convertPropertyToNumber({ object: values, property: "foodKey" });
+      convertPropertyToNumber({ object: values, property: "servings" });
+      // XXX actually confused here, bad style
+      if (!numberOverZero(values.foodKey) ||
+          !numberOverZero(values.servings) &&
+          values.servingSize !== "default" ||
+          values.servingSize !== "single") {
+        return;
+      }
+
+      let servingsConsumed = this._getServingsConsumed(values);
+
+      console.log(servingsConsumed);
+      console.log(values);
+    });
+  }
+
+  _getServingsConsumed(values) {
+    if (values.servingSize === "default") {
+      return values.servings;
+    } else if (values.servingSize === "single") {
+      return values.servings / food.servingSize;
+    }
+  }
+
+  _setFormValues(food) {
+    let foodName = document.getElementById("add-food-name");
+    let foodServingSize = document.getElementById("add-food-serving-size");
+    let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
+    let foodKey = document.getElementById("add-food-key");
+    let foodServing = document.getElementById("add-food-serving");
+    foodName.textContent = food.name;
+    foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
+    foodServingSizeSingle.textContent = `1 ${food.unit}`;
+    foodKey.setAttribute("value", food.foodKey);
+    foodServing.setAttribute("value", food.foodKey);
+  }
+
+  open(food) {
+    this._setFormValues(food);
+    this._form.classList.toggle("hidden", false);
+  }
+
+  _close() {
+    this._form.classList.toggle("hidden", true);
+  }
+}
+
+class PopUp {
+  constructor() {
+    this._container = document.getElementById("panel-pop-up");
+    this._closeButton = document.getElementById("panel-pop-up-exit");
+    this._addFood = new PopUpAddFood(this);
+    // this._openPanel = null;
+    this._init();
+  }
+
+  _init() {
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    this._container.addEventListener("click", (event) => {
+      if (event.target !== this._container) return;
+      this._close();
+    });
+
+    this._closeButton.addEventListener("click", (_event) => {
+      this._close();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (!this._visible || event.code !== "Escape") return;
+      this._close();
+    });
+  }
+
+  _open() {
+    this._container.classList.toggle("hidden", false);
+  }
+
+  close() {
+    this._container.classList.toggle("hidden", true);
+    // openPanel close
+  }
+
+  get _visible() {
+    return !this._container.classList.contains("hidden");
+  }
+
+  addFood(food) {
+    this._open();
+    this._addFood.open(food);
+  }
+}
+
+let popUp = new PopUp();
+
+popUp.addFood({foodKey: 1});
+/*
 class PanelPopUp {
   constructor(databaseDiary, date) {
     this._databaseDiary = databaseDiary;
@@ -10,49 +123,8 @@ class PanelPopUp {
     this._addEventListeners();
   }
 
-  _addEventListeners() {
-    let panelExit = document.getElementById("panel-pop-up-exit");
-
-    this._container.addEventListener("click", (event) => {
-      if (event.target !== this._container) {
-        return;
-      }
-
-      this._panelReject();
-    });
-
-    panelExit.addEventListener("click", (_event) => {
-      this._panelReject();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (this._container.classList.contains("hidden") ||
-          event.code !== "Escape") {
-        return;
-      }
-
-      this._panelReject();
-    });
-
-    handleSubmitEvent(this._addFoodForm, this._addFoodFormEvent);
-  }
-
   async _addFoodFormEvent(values) {
-    if (!convertPropertyToNumber({ object: values, property: "servings" }) ||
-        !convertPropertyToNumber({ object: values, property: "foodKey" })) {
-      this._panelReject();
-      return;
-    }
-
-    console.log(values);
-
     let servingsConsumed;
-    if (values.servingSize === "default") {
-      servingsConsumed = values.servings;
-    } else if (values.servingSize === "single") {
-      servingsConsumed = values.servings / food.servingSize;
-    }
-
     // let caloriesConsumed = servingsConsumed * food.calories;
 
     try {
@@ -68,41 +140,6 @@ class PanelPopUp {
     }
   }
 
-  _hide() {
-    this._container.classList.toggle("hidden", true);
-  }
-
-  _show() {
-    this._container.classList.toggle("hidden", false);
-  }
-
-  _panelReject() {
-    this._hide();
-    this._promiseReject();
-  }
-
-  _panelResolve() {
-    this._hide();
-    this._promiseResolve();
-  }
-
-  _updateFoodPopUpText(food) {
-    let foodName = document.getElementById("add-food-name");
-    let foodServingSize = document.getElementById("add-food-serving-size");
-    let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
-    let foodKey = document.getElementById("add-food-key");
-
-    foodName.textContent = food.name;
-    foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
-    foodServingSizeSingle.textContent = `1 ${food.unit}`;
-    foodKey.setAttribute("value", food.foodKey);
-  }
-
-  _showAddFoodPopUp(food) {
-    this._updateFoodPopUpText(food);
-    this._addFoodForm.classList.toggle("hidden", false);
-  }
-
   addFood(food, promise, promiseResolve, promiseReject) {
     this._promiseReject = promiseReject;
     this._promiseResolve = promiseResolve;
@@ -111,6 +148,7 @@ class PanelPopUp {
     this._showAddFoodPopUp(food);
   }
 }
+*/
 
 function initializeHeader(date) {
   let diaryDate = document.getElementById("diary-date");
