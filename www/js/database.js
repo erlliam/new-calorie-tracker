@@ -256,6 +256,21 @@ class DatabaseDiary {
     );
     return await result;
   }
+
+  async queryKey({ key }) {
+    let resolveResult;
+    let result = new Promise((resolve) => { resolveResult = resolve; });
+
+    await this._database.transactReadOnly({ storeNames: ["diary"] },
+      (stores) => {
+        let request = stores.diary.get(key);
+        request.addEventListener("success", (_event) => {
+          resolveResult(request.result);
+        });
+      }
+    );
+    return await result;
+  }
 }
 
 function deleteDatabase() {

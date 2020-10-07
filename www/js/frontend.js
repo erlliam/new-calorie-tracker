@@ -1,28 +1,35 @@
 "use strict";
 
-function displayEntryInDocument(diaryContainer, entry) {
+async function displayDiaryEntry({ database, diaryContainer, entry }) {
   if (entry.values.type !== "food" && entry.values.type !== "calories") {
     return;
   }
 
+  let food = await database.food.query({ key: entry.values.foodKey });
   let foodContainer = document.createElement("tr");
   let foodName = document.createElement("td");
   let foodServingSize = document.createElement("td");
   let foodCalories = document.createElement("td");
 
+  // XXX only chop off decimal numbers
+  // if it has decimals in the first place
+
+  let amountConsumed = entry.values.servingSize * food.servingSize;
+  let caloriesConsumed = entry.values.servingSize * food.calories;
+
   if (entry.values.type === "food") {
-    console.log("Hey!");
-    foodName.textContent = "look up foodKey and get name...";
-    foodServingSize.textContent = `${entry.values.servingSize} ${entry.values.unit}`;
-    foodCalories.textContent = entry.values.calories;
+    foodName.textContent = food.name;
+    foodServingSize.textContent = `${
+      amountConsumed.toFixed(1)} ${food.unit || ""}`;
+    foodCalories.textContent = caloriesConsumed.toFixed(1);
   } else if (entry.values.type === "calories") {
     foodName.textContent = entry.values.note;
     foodServingSize.textContent = "(added\u00A0calories)";
-    foodCalories.textContent = entry.values.calories;
+    foodCalories.textContent = entry.values.calories.toFixed(1);
   }
 
   foodContainer.classList.add("food");
-  foodContainer.setAttribute("data-id", entry.key);
+  foodContainer.setAttribute("data-key", entry.key);
   foodContainer.append(foodName, foodServingSize, foodCalories);
   diaryContainer.append(foodContainer);
 }
@@ -51,16 +58,12 @@ class PopUpAddFood {
 
       let food = await this._parent.database.food.query({ key: values.foodKey });
       let servingsConsumed = this._getServingsConsumed(food, values);
-      let caloriesConsumed = food.calories * servingsConsumed;
-
-      console.log(servingsConsumed); console.log(caloriesConsumed); console.log(values);
 
       try {
         await this._parent.database.diary.create({
           dateString: getNumericDateString(this._parent.date),
           foodKey: values.foodKey,
           servingSize: servingsConsumed,
-          calories: caloriesConsumed,
           type: "food",
         });
       } catch(error) {
@@ -203,38 +206,35 @@ function initializeOverview() {
 }
 
 async function initializeDiary(database, date) {
-  let diary = document.getElementById("diary");
+  let diaryContainer = document.getElementById("diary");
 
-  let dateString = getNumericDateString(date);
-  let entries = await database.diary.query({ dateString: dateString });
-  console.log(entries);
+  let entries = await database.diary.query({
+    dateString: getNumericDateString(date) });
   for (const entry of entries) {
-    displayEntryInDocument(diary, entry);
+    displayDiaryEntry({ database: database,
+      diaryContainer: diaryContainer, entry: entry });
   }
 
-  diary.addEventListener("click", (event) => {
+  // This loop and event listener
+  // should not be near each other
+
+  diary.addEventListener("click", async (event) => {
     if (event.target.tagName !== "TD") return;
 
     let tableRow = event.target.parentElement;
-    if (!tableRow.hasAttribute("data-id") ||
-        !tableRow.hasAttribute("data-serving-size")) return;
+    if (!tableRow.hasAttribute("data-key")) return;
+    let entryKey = parseInt(tableRow.getAttribute("data-key"));
+    let entry = await database.diary.queryKey({
+      key: entryKey });
 
-    let values = {
-      dateString: getNumericDateString(date),
-      foodId: tableRow.getAttribute("data-food-id"),
-      servingSize: tableRow.getAttribute("data-serving-size")
-    }
+    console.log(entry);
 
-    if (!convertPropertyToNumber({ object: values, property: "foodId" }) ||
-        !convertPropertyToNumber({ object: values, property: "servingSize" }))
-      return;
-
+    // XXX edit diary entries here
+    // fetch food information
     // search up the foodId
     // create a diary entry
     // this entry pop up will have pre filled values
     // the user can edit these values
-
-    console.log(values);
     console.warn("Finish recentFoods eventListener");
   });
 }
