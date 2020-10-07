@@ -1,39 +1,5 @@
 "use strict";
 
-async function displayDiaryEntry({ database, diaryContainer, entry }) {
-  if (entry.values.type !== "food" && entry.values.type !== "calories") {
-    return;
-  }
-
-  let food = await database.food.query({ key: entry.values.foodKey });
-  let foodContainer = document.createElement("tr");
-  let foodName = document.createElement("td");
-  let foodServingSize = document.createElement("td");
-  let foodCalories = document.createElement("td");
-
-  // XXX only chop off decimal numbers
-  // if it has decimals in the first place
-
-  let amountConsumed = entry.values.servingSize * food.servingSize;
-  let caloriesConsumed = entry.values.servingSize * food.calories;
-
-  if (entry.values.type === "food") {
-    foodName.textContent = food.name;
-    foodServingSize.textContent = `${
-      amountConsumed.toFixed(1)} ${food.unit || ""}`;
-    foodCalories.textContent = caloriesConsumed.toFixed(1);
-  } else if (entry.values.type === "calories") {
-    foodName.textContent = entry.values.note;
-    foodServingSize.textContent = "(added\u00A0calories)";
-    foodCalories.textContent = entry.values.calories.toFixed(1);
-  }
-
-  foodContainer.classList.add("food");
-  foodContainer.setAttribute("data-key", entry.key);
-  foodContainer.append(foodName, foodServingSize, foodCalories);
-  diaryContainer.append(foodContainer);
-}
-
 class PopUpAddFood {
   constructor(parent) {
     this._parent = parent;
@@ -97,7 +63,15 @@ class PopUpAddFood {
     foodKey.setAttribute("value", food.foodKey);
   }
 
-  open(food) {
+  async display(food) {
+    this._open(food);
+    // XXX
+    // perhaps a promise?
+    // perhaps we listen for a form submit event once?
+    // what if that submit event fails?
+  }
+
+  _open(food) {
     this._setFormValues(food);
     this._form.classList.toggle("hidden", false);
   }
@@ -151,92 +125,151 @@ class PopUp {
 
   addFood(food) {
     this._open();
-    this._popUpAddFood.open(food);
+    this._popUpAddFood.display(food);
     // XXX Ideal:
     // this._open();
-    // await this._popUpAddFood.open(food);
+    // await this._popUpAddFood.display(food);
     // this._close();
   }
 }
 
-function initializeHeader(date) {
-  let diaryDate = document.getElementById("diary-date");
-  let diaryDateBack = document.getElementById("diary-date-back");
-  let diaryDateForward = document.getElementById("diary-date-forward");
-
-  function updateText() {
-    diaryDate.textContent = getDateString(date);
+class Header {
+  constructor({ date, dateButton, dateNext, datePrevious }) {
+    this._date = date;
+    this._dateButton = dateButton;
+    this._dateNext = dateNext;
+    this._datePrevious = datePrevious;
+    this._init();
   }
 
-  function changeDate(days) {
-    let time = date.getTime();
-    date.setTime(time + (days * (1000 * 60 * 60 * 24)));
+  _init() {
+    this._updateText();
+    this._addEventListeners();
   }
 
-  function changeDateAndUpdateText(days) {
-    changeDate(days);
-    updateText();
+  _updateText() {
+    this._dateButton.textContent = getDateString(this._date);
   }
 
-  function showCalender() {
+  _changeDate(days) {
+    let time = this._date.getTime();
+    this._date.setTime(time + (days * (1000 * 60 * 60 * 24)));
+  }
+
+  _changeDateAndUpdateText(days) {
+    this._changeDate(days);
+    this._updateText();
+  }
+
+  _showCalender() {
     console.warn("Implement header's calender");
   }
 
-  {
-    updateText();
-
-    diaryDate.addEventListener("click", (_event) => {
-      showCalender();
+  _addEventListeners() {
+    this._dateButton.addEventListener("click", (_event) => {
+      this._showCalender();
     });
 
-    diaryDateBack.addEventListener("click", (_event) => {
-      changeDateAndUpdateText(-1);
+    this._dateNext.addEventListener("click", (_event) => {
+      this._changeDateAndUpdateText(-1);
     });
 
-    diaryDateForward.addEventListener("click", (_event) => {
-      changeDateAndUpdateText(1);
+    this._datePrevious.addEventListener("click", (_event) => {
+      this._changeDateAndUpdateText(1);
     });
   }
 }
 
-function initializeOverview() {
-  let toggleOverviewOptions = document.getElementById("toggle-overview-options");
-  let overviewOptions = undefined;
-  console.warn("Implement initializeOverview()");
-}
-
-async function initializeDiary(database, date) {
-  let diaryContainer = document.getElementById("diary");
-
-  let entries = await database.diary.query({
-    dateString: getNumericDateString(date) });
-  for (const entry of entries) {
-    displayDiaryEntry({ database: database,
-      diaryContainer: diaryContainer, entry: entry });
+class Overview {
+  constructor() {
+    this._init();
   }
 
-  // This loop and event listener
-  // should not be near each other
+  _init() {
+    // XXX finish the overview
+    let toggleOverviewOptions = document.getElementById("toggle-overview-options");
+    let overviewOptions = undefined;
+    console.warn("Implement initializeOverview()");
+    // this._addEventListeners();
+  }
+}
 
-  diary.addEventListener("click", async (event) => {
-    if (event.target.tagName !== "TD") return;
+class Diary {
+  constructor({ container, database, date }) {
+    this._container = container;
+    this._database = database;
+    this._date = date;
+    this._init();
+  }
 
-    let tableRow = event.target.parentElement;
-    if (!tableRow.hasAttribute("data-key")) return;
-    let entryKey = parseInt(tableRow.getAttribute("data-key"));
-    let entry = await database.diary.queryKey({
-      key: entryKey });
+  _init() {
+    this._updateDiary();
+    this._addEventListeners();
+  }
 
-    console.log(entry);
+  _addEventListeners() {
+    this._container.addEventListener("click", async (event) => {
+      if (event.target.tagName !== "TD") return;
 
-    // XXX edit diary entries here
-    // fetch food information
-    // search up the foodId
-    // create a diary entry
-    // this entry pop up will have pre filled values
-    // the user can edit these values
-    console.warn("Finish recentFoods eventListener");
-  });
+      let tableRow = event.target.parentElement;
+      if (!tableRow.hasAttribute("data-key")) return;
+      let entryKey = parseInt(tableRow.getAttribute("data-key"));
+      let entry = await this._database.diary.queryKey({
+        key: entryKey });
+
+      console.log(entry);
+
+      // XXX edit diary entries here
+      // fetch food information
+      // search up the foodId
+      // create a diary entry
+      // this entry pop up will have pre filled values
+      // the user can edit these values
+      console.warn("Finish recentFoods eventListener");
+    });
+  }
+
+  async _updateDiary() {
+    let entries = await this._database.diary.query({
+      dateString: getNumericDateString(this._date) });
+    for (const entry of entries) {
+      this._displayEntry(entry);
+    }
+  }
+
+  async _displayEntry(entry) {
+    if (entry.values.type !== "food" && entry.values.type !== "calories") {
+      return;
+    }
+
+    let food = await this._database.food.query({ key: entry.values.foodKey });
+    let foodContainer = document.createElement("tr");
+    let foodName = document.createElement("td");
+    let foodServingSize = document.createElement("td");
+    let foodCalories = document.createElement("td");
+
+    // XXX only chop off decimal numbers
+    // if it has decimals in the first place
+
+    let amountConsumed = entry.values.servingSize * food.servingSize;
+    let caloriesConsumed = entry.values.servingSize * food.calories;
+
+    if (entry.values.type === "food") {
+      foodName.textContent = food.name;
+      foodServingSize.textContent = `${
+        amountConsumed.toFixed(1)} ${food.unit || ""}`;
+      foodCalories.textContent = caloriesConsumed.toFixed(1);
+    } else if (entry.values.type === "calories") {
+      foodName.textContent = entry.values.note;
+      foodServingSize.textContent = "(added\u00A0calories)";
+      foodCalories.textContent = entry.values.calories.toFixed(1);
+    }
+
+    foodContainer.classList.add("food");
+    foodContainer.setAttribute("data-key", entry.key);
+    foodContainer.append(foodName, foodServingSize, foodCalories);
+    this._container.append(foodContainer);
+  }
 }
 
 function initializeDiaryOptions(database, date) {
