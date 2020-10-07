@@ -24,7 +24,12 @@
     database: database,
     date: date
   });
+  let diaryOptions = new DiaryOptions();
 
-  // initializeDiary(database, date);
-  initializeDiaryOptions(database, date);
+  //initializeDiaryOptions(database, date);
+
+  // XXX test
+  // let food = {"foodKey":3,"name":"Aqua lentils","servingSize":58,"unit":"g","calories":102}
+  // let popUp = new PopUp({ database: database, date: date });
+  // popUp.addFood(food);
 })();

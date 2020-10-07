@@ -272,6 +272,64 @@ class Diary {
   }
 }
 
+class DiaryOptions {
+  constructor() {
+    this._container = document.getElementById("diary-options");
+    this._openContainer = document.getElementById("toggle-diary-options");
+    this._activeChild = null;
+    this._init();
+  }
+
+  _init() {
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    this._openContainer.addEventListener("click", (_event) => {
+      let hidden = this._container.classList.toggle("hidden");
+      if (hidden && this._activeChild !== null) {
+        this._closeActiveChild();
+      }
+    });
+
+    this._container.addEventListener("click", (event) => {
+      if (!event.target.id.startsWith("toggle-")) return;
+
+      // XXX things are getting a bit magical...
+      // the alternative is uglier...
+      let childId = event.target.id.substring(7);
+      let child = document.getElementById(childId);
+      let hidden = child.classList.toggle("hidden");
+      if (hidden) {
+        this._activeChild = null;
+      } else {
+        if (this._activeChild !== null) {
+          this._closeActiveChild();
+        }
+        this._activeChild = child;
+      }
+    });
+
+    // XXX continue here
+    // let recentFoods = document.getElementById("");
+    // let foodSearch = document.getElementById("");
+    // let createFood = document.getElementById("");
+    // let addCalories = document.getElementById("");
+    // recentFoods.addEventListener("click", X);
+    // handleSubmitEvent(foodSearch, X);
+    // handleSubmitEvent(createFood, X);
+    // handleSubmitEvent(addCalories, X);
+  }
+
+  _closeActiveChild() {
+    this._activeChild.classList.toggle("hidden", true);
+    if (this._activeChild.tagName === "FORM") {
+      this._activeChild.reset();
+    }
+    this._activeChild = null;
+  }
+}
+
 function initializeDiaryOptions(database, date) {
   let toggleDiaryOptions = document.getElementById("toggle-diary-options");
   let diaryOptions = document.getElementById("diary-options");
@@ -412,10 +470,5 @@ function initializeDiaryOptions(database, date) {
         throw error;
       }
     });
-
-    // XXX test
-    let food = {"foodKey":3,"name":"Aqua lentils","servingSize":58,"unit":"g","calories":102}
-    let popUp = new PopUp({ database: database, date: date });
-    popUp.addFood(food);
   }
 }
