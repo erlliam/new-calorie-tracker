@@ -1,5 +1,32 @@
 "use strict";
 
+function displayEntryInDocument(diaryContainer, entry) {
+  if (entry.values.type !== "food" && entry.values.type !== "calories") {
+    return;
+  }
+
+  let foodContainer = document.createElement("tr");
+  let foodName = document.createElement("td");
+  let foodServingSize = document.createElement("td");
+  let foodCalories = document.createElement("td");
+
+  if (entry.values.type === "food") {
+    console.log("Hey!");
+    foodName.textContent = "look up foodKey and get name...";
+    foodServingSize.textContent = `${entry.values.servingSize} ${entry.values.unit}`;
+    foodCalories.textContent = entry.values.calories;
+  } else if (entry.values.type === "calories") {
+    foodName.textContent = entry.values.note;
+    foodServingSize.textContent = "(added\u00A0calories)";
+    foodCalories.textContent = entry.values.calories;
+  }
+
+  foodContainer.classList.add("food");
+  foodContainer.setAttribute("data-id", entry.key);
+  foodContainer.append(foodName, foodServingSize, foodCalories);
+  diaryContainer.append(foodContainer);
+}
+
 class PopUpAddFood {
   constructor(parent) {
     this._parent = parent;
@@ -15,22 +42,40 @@ class PopUpAddFood {
     handleSubmitEvent(this._form, async (values) => {
       convertPropertyToNumber({ object: values, property: "foodKey" });
       convertPropertyToNumber({ object: values, property: "servings" });
-      // XXX actually confused here, bad style
       if (!numberOverZero(values.foodKey) ||
-          !numberOverZero(values.servings) &&
-          values.servingSize !== "default" ||
-          values.servingSize !== "single") {
+          !numberOverZero(values.servings) ||
+          (values.servingSize !== "default" &&
+          values.servingSize !== "single")) {
         return;
       }
 
-      let servingsConsumed = this._getServingsConsumed(values);
+      let food = await this._parent.database.food.query({ key: values.foodKey });
+      let servingsConsumed = this._getServingsConsumed(food, values);
+      let caloriesConsumed = food.calories * servingsConsumed;
 
-      console.log(servingsConsumed);
-      console.log(values);
+      console.log(servingsConsumed); console.log(caloriesConsumed); console.log(values);
+
+      try {
+        await this._parent.database.diary.create({
+          dateString: getNumericDateString(this._parent.date),
+          foodKey: values.foodKey,
+          servingSize: servingsConsumed,
+          calories: caloriesConsumed,
+          type: "food",
+        });
+      } catch(error) {
+        // XXX revisit here.
+        throw error;
+      }
+
+      // XXX big smell. Don't let this class handle the
+      // other class's shit.
+      this._close();
+      this._parent.close();
     });
   }
 
-  _getServingsConsumed(values) {
+  _getServingsConsumed(food, values) {
     if (values.servingSize === "default") {
       return values.servings;
     } else if (values.servingSize === "single") {
@@ -43,12 +88,10 @@ class PopUpAddFood {
     let foodServingSize = document.getElementById("add-food-serving-size");
     let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
     let foodKey = document.getElementById("add-food-key");
-    let foodServing = document.getElementById("add-food-serving");
     foodName.textContent = food.name;
     foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
     foodServingSizeSingle.textContent = `1 ${food.unit}`;
     foodKey.setAttribute("value", food.foodKey);
-    foodServing.setAttribute("value", food.foodKey);
   }
 
   open(food) {
@@ -62,11 +105,12 @@ class PopUpAddFood {
 }
 
 class PopUp {
-  constructor() {
+  constructor({ database, date }) {
+    this.database = database;
+    this.date = date;
     this._container = document.getElementById("panel-pop-up");
     this._closeButton = document.getElementById("panel-pop-up-exit");
-    this._addFood = new PopUpAddFood(this);
-    // this._openPanel = null;
+    this._popUpAddFood = new PopUpAddFood(this);
     this._init();
   }
 
@@ -77,16 +121,16 @@ class PopUp {
   _addEventListeners() {
     this._container.addEventListener("click", (event) => {
       if (event.target !== this._container) return;
-      this._close();
+      this.close();
     });
 
     this._closeButton.addEventListener("click", (_event) => {
-      this._close();
+      this.close();
     });
 
     document.addEventListener("keydown", (event) => {
       if (!this._visible || event.code !== "Escape") return;
-      this._close();
+      this.close();
     });
   }
 
@@ -96,7 +140,6 @@ class PopUp {
 
   close() {
     this._container.classList.toggle("hidden", true);
-    // openPanel close
   }
 
   get _visible() {
@@ -105,50 +148,13 @@ class PopUp {
 
   addFood(food) {
     this._open();
-    this._addFood.open(food);
+    this._popUpAddFood.open(food);
+    // XXX Ideal:
+    // this._open();
+    // await this._popUpAddFood.open(food);
+    // this._close();
   }
 }
-
-let popUp = new PopUp();
-
-popUp.addFood({foodKey: 1});
-/*
-class PanelPopUp {
-  constructor(databaseDiary, date) {
-    this._databaseDiary = databaseDiary;
-    this._date = date;
-    this._container = document.getElementById("panel-pop-up");
-    this._addFoodForm = document.getElementById("add-food-form");
-
-    this._addEventListeners();
-  }
-
-  async _addFoodFormEvent(values) {
-    let servingsConsumed;
-    // let caloriesConsumed = servingsConsumed * food.calories;
-
-    try {
-      await this._databaseDiary.create({
-        dateString: getNumericDateString(this._date),
-        foodKey: food.foodKey,
-        servingSize: servingsConsumed
-      });
-      this._panelResolve();
-    } catch(error) {
-      this._panelReject();
-      throw error;
-    }
-  }
-
-  addFood(food, promise, promiseResolve, promiseReject) {
-    this._promiseReject = promiseReject;
-    this._promiseResolve = promiseResolve;
-
-    this._show();
-    this._showAddFoodPopUp(food);
-  }
-}
-*/
 
 function initializeHeader(date) {
   let diaryDate = document.getElementById("diary-date");
@@ -194,30 +200,6 @@ function initializeOverview() {
   let toggleOverviewOptions = document.getElementById("toggle-overview-options");
   let overviewOptions = undefined;
   console.warn("Implement initializeOverview()");
-}
-
-function displayEntryInDocument(diary, entry) {
-  let foodContainer = document.createElement("tr");
-  let foodName = document.createElement("td");
-  let foodServingSize = document.createElement("td");
-  let foodCalories = document.createElement("td");
-
-  if (entry.values.hasOwnProperty("note")) {
-    foodName.textContent = entry.values.note;
-    foodServingSize.textContent = "(added\u00A0calories)";
-    foodCalories.textContent = entry.values.calories;
-  } else {
-    foodName.textContent = entry.values.name;
-    foodServingSize.textContent = `${entry.values.servingSize} ${entry.values.unit}`;
-    foodCalories.textContent = 0;
-    // XXX calculate calories based on servingSize and foodId.
-    foodName.textContent = "WTF error man";
-  }
-
-  foodContainer.classList.add("food");
-  foodContainer.setAttribute("data-id", entry.key);
-  foodContainer.append(foodName, foodServingSize, foodCalories);
-  diary.append(foodContainer);
 }
 
 async function initializeDiary(database, date) {
@@ -398,25 +380,9 @@ function initializeDiaryOptions(database, date) {
       }
     });
 
-              let panelPopUp = new PanelPopUp(database.diary, date);
-
-              let promiseResolve;
-              let promiseReject;
-              let promise = new Promise((resolve, reject) => {
-                promiseResolve = resolve;
-                promiseReject = reject;
-              });
-
-              let food = {"foodKey":3,"name":"Aqua lentils","servingSize":58,"unit":"g","calories":102}
-
-              panelPopUp.addFood(food, promise, promiseResolve, promiseReject);
-
-              promise.then(() => {
-                console.log("Resolved ok.");
-              });
-
-              promise.catch(() => {
-                console.log("Rejected ok");
-              });
+    // XXX test
+    let food = {"foodKey":3,"name":"Aqua lentils","servingSize":58,"unit":"g","calories":102}
+    let popUp = new PopUp({ database: database, date: date });
+    popUp.addFood(food);
   }
 }
