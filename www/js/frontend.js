@@ -273,14 +273,22 @@ class Diary {
 }
 
 class DiaryOptions {
-  constructor() {
+  constructor({ database, date }) {
+    this._database = database;
+    this._date = date;
     this._container = document.getElementById("diary-options");
     this._openContainer = document.getElementById("toggle-diary-options");
+    this._recentFoods = document.getElementById("recent-foods");
+    this._foodSearch = document.getElementById("food-search");
+    this._createFood = document.getElementById("create-food");
+    this._addCalories = document.getElementById("add-calories");
+
     this._activeChild = null;
     this._init();
   }
 
   _init() {
+    this._initializeRecentFoods();
     this._addEventListeners();
   }
 
@@ -295,8 +303,6 @@ class DiaryOptions {
     this._container.addEventListener("click", (event) => {
       if (!event.target.id.startsWith("toggle-")) return;
 
-      // XXX things are getting a bit magical...
-      // the alternative is uglier...
       let childId = event.target.id.substring(7);
       let child = document.getElementById(childId);
       let hidden = child.classList.toggle("hidden");
@@ -310,15 +316,10 @@ class DiaryOptions {
       }
     });
 
-    // XXX continue here
-    // let recentFoods = document.getElementById("");
-    // let foodSearch = document.getElementById("");
-    // let createFood = document.getElementById("");
-    // let addCalories = document.getElementById("");
-    // recentFoods.addEventListener("click", X);
-    // handleSubmitEvent(foodSearch, X);
-    // handleSubmitEvent(createFood, X);
-    // handleSubmitEvent(addCalories, X);
+    this._recentFoods.addEventListener("click", this._recentFoodsClicked);
+    handleSubmitEvent(this._foodSearch, this._foodSearchSubmitted);
+    handleSubmitEvent(this._createFood, this._createFoodSubmitted);
+    handleSubmitEvent(this._addCalories, this._addCaloriesSubmitted);
   }
 
   _closeActiveChild() {
@@ -328,147 +329,91 @@ class DiaryOptions {
     }
     this._activeChild = null;
   }
-}
 
-function initializeDiaryOptions(database, date) {
-  let toggleDiaryOptions = document.getElementById("toggle-diary-options");
-  let diaryOptions = document.getElementById("diary-options");
-
-  let toggleRecentFoods = document.getElementById("toggle-recent-foods");
-  let recentFoods = document.getElementById("recent-foods");
-  let toggleFoodSearch = document.getElementById("toggle-food-search");
-  let foodSearch = document.getElementById("food-search");
-  let toggleCreateFood = document.getElementById("toggle-create-food");
-  let createFood = document.getElementById("create-food");
-  let toggleAddCalories = document.getElementById("toggle-add-calories");
-  let addCalories = document.getElementById("add-calories");
-
-  let openedPanel = null;
-
-  function closeOpenedPanel() {
-    openedPanel.classList.toggle("hidden", true);
-
-    if (openedPanel.tagName === "FORM") {
-      openedPanel.reset();
-    }
-
-    openedPanel = null;
-  }
-
-  function togglePanel(button, panel) {
-    button.addEventListener("click", (_event) => {
-      let isHidden = panel.classList.toggle("hidden");
-      if (isHidden) {
-        openedPanel = null;
-      } else {
-        if (openedPanel !== null) {
-          closeOpenedPanel();
-        }
-        openedPanel = panel;
-      }
-    });
-  }
-
-  function initializeRecentFoods() {
+  _initializeRecentFoods() {
     console.warn("Implement initializeRecentFoods()");
   }
 
-  {
-    toggleDiaryOptions.addEventListener("click", (_event) => {
-      let isHidden = diaryOptions.classList.toggle("hidden");
-      if (isHidden) {
-        if (openedPanel !== null) {
-          closeOpenedPanel();
-        }
-      }
-    });
+  async _recentFoodsClicked(event) {
+    console.log(event);
+    if (event.target.tagName !== "TD") return;
 
-    togglePanel(toggleRecentFoods, recentFoods);
-    togglePanel(toggleFoodSearch, foodSearch);
-    togglePanel(toggleCreateFood, createFood);
-    togglePanel(toggleAddCalories, addCalories);
+    let tableRow = event.target.parentElement;
+    if (!tableRow.hasAttribute("data-id") ||
+        !tableRow.hasAttribute("data-serving-size")) return;
 
-    initializeRecentFoods();
+    let values = {
+      dateString: getNumericDateString(date),
+      foodId: tableRow.getAttribute("data-food-id"),
+      servingSize: tableRow.getAttribute("data-serving-size")
+    }
 
-    recentFoods.addEventListener("click", (event) => {
-      if (event.target.tagName !== "TD") return;
+    if (!convertPropertyToNumber({ object: values, property: "foodId" }) ||
+        !convertPropertyToNumber({ object: values, property: "servingSize" }))
+      return;
 
-      let tableRow = event.target.parentElement;
-      if (!tableRow.hasAttribute("data-id") ||
-          !tableRow.hasAttribute("data-serving-size")) return;
+    // search up the foodId
+    // create a diary entry
+    // this entry pop up will have pre filled values
+    // the user can edit these values
 
-      let values = {
-        dateString: getNumericDateString(date),
-        foodId: tableRow.getAttribute("data-food-id"),
-        servingSize: tableRow.getAttribute("data-serving-size")
-      }
+    console.log(values);
+    console.warn("Finish recentFoods eventListener");
+  }
 
-      if (!convertPropertyToNumber({ object: values, property: "foodId" }) ||
-          !convertPropertyToNumber({ object: values, property: "servingSize" }))
-        return;
+  async _foodSearchSubmitted(values) {
+    // XXX show users the messages in console.log
+    let query = values.query;
 
-      // search up the foodId
-      // create a diary entry
-      // this entry pop up will have pre filled values
-      // the user can edit these values
+    try {
+      let results = await database.food.search({ query: query });
+      foodSearch.reset();
+      toggleDiaryOptions.click();
+      console.log("Search for:", query, "Results:", results);
+      // XXX display this to the DOM?
+    } catch(error) {
+      console.log("Failed to search for:", query);
+      throw error;
+    }
+    console.log(values);
+  }
 
-      console.log(values);
-      console.warn("Finish recentFoods eventListener");
-    });
+  async _createFoodSubmitted(values) {
+    // XXX show users the messages in console.log
+    if (!convertPropertyToNumber({ object: values, property: "calories" }) ||
+        !convertPropertyToNumber({ object: values, property: "servingSize" })) {
+      console.log("Failed to convert calories/servingSize to number:", values);
+      return;
+    }
 
-    handleSubmitEvent(foodSearch, async (values) => {
-      // XXX show users the messages in console.log
-      let query = values.query;
+    try {
+      await database.food.create(values);
+      createFood.reset();
+      toggleDiaryOptions.click();
+      console.log("Food created:", values);
+    } catch(error) {
+      console.log("Failed to create food:", values);
+      throw error;
+    }
+  }
 
-      try {
-        let results = await database.food.search({ query: query });
-        foodSearch.reset();
-        toggleDiaryOptions.click();
-        console.log("Search for:", query, "Results:", results);
-        // XXX display this to the DOM?
-      } catch(error) {
-        console.log("Failed to search for:", query);
-        throw error;
-      }
-    });
+  async _addCaloriesSubmitted(values) {
+    // XXX show users the messages in console.log
+    if (!convertPropertyToNumber({ object: values, property: "calories" })) {
+      console.log("Failed to convert calories to number:", values);
+      return;
+    }
 
-    handleSubmitEvent(createFood, async (values) => {
-      // XXX show users the messages in console.log
-      if (!convertPropertyToNumber({ object: values, property: "calories" }) ||
-          !convertPropertyToNumber({ object: values, property: "servingSize" })) {
-        console.log("Failed to convert calories/servingSize to number:", values);
-        return;
-      }
+    values.dateString = getNumericDateString(date);
 
-      try {
-        await database.food.create(values);
-        createFood.reset();
-        toggleDiaryOptions.click();
-        console.log("Food created:", values);
-      } catch(error) {
-        console.log("Failed to create food:", values);
-        throw error;
-      }
-    });
-
-    handleSubmitEvent(addCalories, async (values) => {
-      // XXX show users the messages in console.log
-      if (!convertPropertyToNumber({ object: values, property: "calories" })) {
-        console.log("Failed to convert calories to number:", values);
-        return;
-      }
-
-      values.dateString = getNumericDateString(date);
-
-      try {
-        await database.diary.addCalories(values);
-        addCalories.reset();
-        toggleDiaryOptions.click();
-        console.log("Calories added:", values);
-      } catch(error) {
-        console.log("Failed to add calories:", values);
-        throw error;
-      }
-    });
+    try {
+      await database.diary.addCalories(values);
+      addCalories.reset();
+      toggleDiaryOptions.click();
+      console.log("Calories added:", values);
+    } catch(error) {
+      console.log("Failed to add calories:", values);
+      throw error;
+    }
   }
 }

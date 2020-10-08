@@ -24,8 +24,7 @@
     database: database,
     date: date
   });
-  let diaryOptions = new DiaryOptions();
-
+  let diaryOptions = new DiaryOptions({ database: database, date: date });
   //initializeDiaryOptions(database, date);
 
   // XXX test
