@@ -74,20 +74,7 @@
             <th>Calories</th>
           </tr>
         </thead>
-        <tbody id="diary">
-          <!--
-          <tr class="food">
-            <td>Potato</td>
-            <td>100 g</td>
-            <td>205 calories</td>
-          </tr>
-          <tr class="food">
-            <td>Potato</td>
-            <td>100 g</td>
-            <td>205 calories</td>
-          </tr>
-          -->
-        </tbody>
+        <tbody id="diary"></tbody>
       </table>
     </article>
 
@@ -161,6 +148,7 @@
           <label>Note - <em>optional</em></label>
           <input name="note" type="text">
         </div>
+        <input type="hidden" name="type" value="calories">
         <input type="submit" value="Add calories">
       </form>
     </article>
@@ -174,7 +162,6 @@
   <script src="js/helpers.js"></script>
   <script src="js/frontend.js"></script>
   <script src="js/database.js"></script>
-  <!-- <script src="js/test.js"></script> -->
   <script src="js/main.js"></script>
 </body>
 </html>

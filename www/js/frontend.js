@@ -101,16 +101,10 @@ class Diary {
       dateString: getNumericDateString(this._date) });
     for (const entry of entries) {
       this._displayEntry(entry);
-      console.log(entry);
     }
   }
 
   async _displayEntry(entry) {
-    if (entry.values.type !== "food" && entry.values.type !== "calories") {
-      return;
-    }
-
-    let food = await this._database.food.query({ key: entry.values.foodKey });
     let foodContainer = document.createElement("tr");
     let foodName = document.createElement("td");
     let foodServingSize = document.createElement("td");
@@ -119,14 +113,15 @@ class Diary {
     // XXX only chop off decimal numbers
     // if it has decimals in the first place
 
-    let amountConsumed = entry.values.servingSize * food.servingSize;
-    let caloriesConsumed = entry.values.servingSize * food.calories;
-
     if (entry.values.type === "food") {
+      let amountConsumed = entry.values.servingSize * food.servingSize;
+      let caloriesConsumed = entry.values.servingSize * food.calories;
+      let food = await this._database.food.query({ key: entry.values.foodKey });
       foodName.textContent = food.name;
       foodServingSize.textContent = `${
         amountConsumed.toFixed(1)} ${food.unit || ""}`;
       foodCalories.textContent = caloriesConsumed.toFixed(1);
+      foodContainer.setAttribute("data-key", entry.key);
     } else if (entry.values.type === "calories") {
       foodName.textContent = entry.values.note;
       foodServingSize.textContent = "(added\u00A0calories)";
@@ -134,7 +129,6 @@ class Diary {
     }
 
     foodContainer.classList.add("food");
-    foodContainer.setAttribute("data-key", entry.key);
     foodContainer.append(foodName, foodServingSize, foodCalories);
     this._container.append(foodContainer);
   }
