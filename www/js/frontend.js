@@ -1,138 +1,5 @@
 "use strict";
 
-class PopUpAddFood {
-  constructor(parent) {
-    this._parent = parent;
-    this._form = document.getElementById("add-food-form");
-    this._init();
-  }
-
-  _init() {
-    this._addEventListeners();
-  }
-
-  _addEventListeners() {
-    handleSubmitEvent(this._form, async (values) => {
-      convertPropertyToNumber({ object: values, property: "foodKey" });
-      convertPropertyToNumber({ object: values, property: "servings" });
-      if (!numberOverZero(values.foodKey) ||
-          !numberOverZero(values.servings) ||
-          (values.servingSize !== "default" &&
-          values.servingSize !== "single")) {
-        return;
-      }
-
-      let food = await this._parent.database.food.query({ key: values.foodKey });
-      let servingsConsumed = this._getServingsConsumed(food, values);
-
-      try {
-        await this._parent.database.diary.create({
-          dateString: getNumericDateString(this._parent.date),
-          foodKey: values.foodKey,
-          servingSize: servingsConsumed,
-          type: "food",
-        });
-      } catch(error) {
-        // XXX revisit here.
-        throw error;
-      }
-
-      // XXX big smell. Don't let this class handle the
-      // other class's shit.
-      this._close();
-      this._parent.close();
-    });
-  }
-
-  _getServingsConsumed(food, values) {
-    if (values.servingSize === "default") {
-      return values.servings;
-    } else if (values.servingSize === "single") {
-      return values.servings / food.servingSize;
-    }
-  }
-
-  _setFormValues(food) {
-    let foodName = document.getElementById("add-food-name");
-    let foodServingSize = document.getElementById("add-food-serving-size");
-    let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
-    let foodKey = document.getElementById("add-food-key");
-    foodName.textContent = food.name;
-    foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
-    foodServingSizeSingle.textContent = `1 ${food.unit}`;
-    foodKey.setAttribute("value", food.foodKey);
-  }
-
-  async display(food) {
-    this._open(food);
-    // XXX
-    // perhaps a promise?
-    // perhaps we listen for a form submit event once?
-    // what if that submit event fails?
-  }
-
-  _open(food) {
-    this._setFormValues(food);
-    this._form.classList.toggle("hidden", false);
-  }
-
-  _close() {
-    this._form.classList.toggle("hidden", true);
-  }
-}
-
-class PopUp {
-  constructor({ database, date }) {
-    this.database = database;
-    this.date = date;
-    this._container = document.getElementById("panel-pop-up");
-    this._closeButton = document.getElementById("panel-pop-up-exit");
-    this._popUpAddFood = new PopUpAddFood(this);
-    this._init();
-  }
-
-  _init() {
-    this._addEventListeners();
-  }
-
-  _addEventListeners() {
-    this._container.addEventListener("click", (event) => {
-      if (event.target !== this._container) return;
-      this.close();
-    });
-
-    this._closeButton.addEventListener("click", (_event) => {
-      this.close();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (!this._visible || event.code !== "Escape") return;
-      this.close();
-    });
-  }
-
-  _open() {
-    this._container.classList.toggle("hidden", false);
-  }
-
-  close() {
-    this._container.classList.toggle("hidden", true);
-  }
-
-  get _visible() {
-    return !this._container.classList.contains("hidden");
-  }
-
-  addFood(food) {
-    this._open();
-    this._popUpAddFood.display(food);
-    // XXX Ideal:
-    // this._open();
-    // await this._popUpAddFood.display(food);
-    // this._close();
-  }
-}
-
 class Header {
   constructor({ date, dateButton, dateNext, datePrevious }) {
     this._date = date;
@@ -417,3 +284,137 @@ class DiaryOptions {
     }
   }
 }
+
+class PopUp {
+  constructor({ database, date }) {
+    this.database = database;
+    this.date = date;
+    this._container = document.getElementById("panel-pop-up");
+    this._closeButton = document.getElementById("panel-pop-up-exit");
+    this._popUpAddFood = new PopUpAddFood(this);
+    this._init();
+  }
+
+  _init() {
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    this._container.addEventListener("click", (event) => {
+      if (event.target !== this._container) return;
+      this.close();
+    });
+
+    this._closeButton.addEventListener("click", (_event) => {
+      this.close();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (!this._visible || event.code !== "Escape") return;
+      this.close();
+    });
+  }
+
+  _open() {
+    this._container.classList.toggle("hidden", false);
+  }
+
+  close() {
+    this._container.classList.toggle("hidden", true);
+  }
+
+  get _visible() {
+    return !this._container.classList.contains("hidden");
+  }
+
+  addFood(food) {
+    this._open();
+    this._popUpAddFood.display(food);
+    // XXX Ideal:
+    // this._open();
+    // await this._popUpAddFood.display(food);
+    // this._close();
+  }
+}
+
+class PopUpAddFood {
+  constructor(parent) {
+    this._parent = parent;
+    this._form = document.getElementById("add-food-form");
+    this._init();
+  }
+
+  _init() {
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    handleSubmitEvent(this._form, async (values) => {
+      convertPropertyToNumber({ object: values, property: "foodKey" });
+      convertPropertyToNumber({ object: values, property: "servings" });
+      if (!numberOverZero(values.foodKey) ||
+          !numberOverZero(values.servings) ||
+          (values.servingSize !== "default" &&
+          values.servingSize !== "single")) {
+        return;
+      }
+
+      let food = await this._parent.database.food.query({ key: values.foodKey });
+      let servingsConsumed = this._getServingsConsumed(food, values);
+
+      try {
+        await this._parent.database.diary.create({
+          dateString: getNumericDateString(this._parent.date),
+          foodKey: values.foodKey,
+          servingSize: servingsConsumed,
+          type: "food",
+        });
+      } catch(error) {
+        // XXX revisit here.
+        throw error;
+      }
+
+      // XXX big smell. Don't let this class handle the
+      // other class's shit.
+      this._close();
+      this._parent.close();
+    });
+  }
+
+  _getServingsConsumed(food, values) {
+    if (values.servingSize === "default") {
+      return values.servings;
+    } else if (values.servingSize === "single") {
+      return values.servings / food.servingSize;
+    }
+  }
+
+  _setFormValues(food) {
+    let foodName = document.getElementById("add-food-name");
+    let foodServingSize = document.getElementById("add-food-serving-size");
+    let foodServingSizeSingle = document.getElementById("add-food-serving-size-one");
+    let foodKey = document.getElementById("add-food-key");
+    foodName.textContent = food.name;
+    foodServingSize.textContent = `${food.servingSize} ${food.unit}`;
+    foodServingSizeSingle.textContent = `1 ${food.unit}`;
+    foodKey.setAttribute("value", food.foodKey);
+  }
+
+  async display(food) {
+    this._open(food);
+    // XXX
+    // perhaps a promise?
+    // perhaps we listen for a form submit event once?
+    // what if that submit event fails?
+  }
+
+  _open(food) {
+    this._setFormValues(food);
+    this._form.classList.toggle("hidden", false);
+  }
+
+  _close() {
+    this._form.classList.toggle("hidden", true);
+  }
+}
+
