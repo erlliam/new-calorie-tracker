@@ -14,6 +14,20 @@ class Header {
     this._addEventListeners();
   }
 
+  _addEventListeners() {
+    this._dateButton.addEventListener("click", (_event) => {
+      this._showCalender();
+    });
+
+    this._dateNext.addEventListener("click", (_event) => {
+      this._changeDateAndUpdateText(-1);
+    });
+
+    this._datePrevious.addEventListener("click", (_event) => {
+      this._changeDateAndUpdateText(1);
+    });
+  }
+
   _updateText() {
     this._dateButton.textContent = getDateString(this._date);
   }
@@ -30,20 +44,6 @@ class Header {
 
   _showCalender() {
     console.warn("Implement header's calender");
-  }
-
-  _addEventListeners() {
-    this._dateButton.addEventListener("click", (_event) => {
-      this._showCalender();
-    });
-
-    this._dateNext.addEventListener("click", (_event) => {
-      this._changeDateAndUpdateText(-1);
-    });
-
-    this._datePrevious.addEventListener("click", (_event) => {
-      this._changeDateAndUpdateText(1);
-    });
   }
 }
 
@@ -101,6 +101,7 @@ class Diary {
       dateString: getNumericDateString(this._date) });
     for (const entry of entries) {
       this._displayEntry(entry);
+      console.log(entry);
     }
   }
 
@@ -183,10 +184,10 @@ class DiaryOptions {
       }
     });
 
-    this._recentFoods.addEventListener("click", this._recentFoodsClicked);
-    handleSubmitEvent(this._foodSearch, this._foodSearchSubmitted);
-    handleSubmitEvent(this._createFood, this._createFoodSubmitted);
-    handleSubmitEvent(this._addCalories, this._addCaloriesSubmitted);
+    this._recentFoods.addEventListener("click", this._recentFoodsClicked.bind(this));
+    handleSubmitEvent(this._foodSearch, this._foodSearchSubmitted.bind(this));
+    handleSubmitEvent(this._createFood, this._createFoodSubmitted.bind(this));
+    handleSubmitEvent(this._addCalories, this._addCaloriesSubmitted.bind(this));
   }
 
   _closeActiveChild() {
@@ -229,20 +230,17 @@ class DiaryOptions {
   }
 
   async _foodSearchSubmitted(values) {
-    // XXX show users the messages in console.log
     let query = values.query;
-
     try {
-      let results = await database.food.search({ query: query });
-      foodSearch.reset();
-      toggleDiaryOptions.click();
+      let results = await this._database.food.search({ query: query });
+      this._foodSearch.reset();
+      this._openContainer.click();
       console.log("Search for:", query, "Results:", results);
       // XXX display this to the DOM?
     } catch(error) {
       console.log("Failed to search for:", query);
       throw error;
     }
-    console.log(values);
   }
 
   async _createFoodSubmitted(values) {
@@ -252,11 +250,10 @@ class DiaryOptions {
       console.log("Failed to convert calories/servingSize to number:", values);
       return;
     }
-
     try {
-      await database.food.create(values);
-      createFood.reset();
-      toggleDiaryOptions.click();
+      await this._database.food.create(values);
+      this._createFood.reset();
+      this._openContainer.click();
       console.log("Food created:", values);
     } catch(error) {
       console.log("Failed to create food:", values);
@@ -270,14 +267,11 @@ class DiaryOptions {
       console.log("Failed to convert calories to number:", values);
       return;
     }
-
-    values.dateString = getNumericDateString(date);
-
+    values.dateString = getNumericDateString(this._date);
     try {
-      await database.diary.addCalories(values);
-      addCalories.reset();
-      toggleDiaryOptions.click();
-      console.log("Calories added:", values);
+      await this._database.diary.addCalories(values);
+      this._addCalories.reset();
+      this._openContainer.click();
     } catch(error) {
       console.log("Failed to add calories:", values);
       throw error;
@@ -417,4 +411,3 @@ class PopUpAddFood {
     this._form.classList.toggle("hidden", true);
   }
 }
-
