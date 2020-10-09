@@ -66,7 +66,7 @@ class Overview {
 
   _addEventListeners() {
     this._openOptions.addEventListener("click", (_event) => {
-      this._popUp.overviewOptions();
+      this._popUp.overviewOptions(this.updateOverview.bind(this));
     });
   }
 
@@ -74,6 +74,7 @@ class Overview {
     let entries = await this._database.diary.query({
       dateString: getNumericDateString(this._date) });
     let goal = 2000;
+    // let goal = await this._database.options.get("goal");
     let consumed = entries.reduce((consumed, entry) => {
       return consumed + entry.values.calories;
     }, 0);
@@ -351,9 +352,9 @@ class PopUp {
     // this._close();
   }
 
-  overviewOptions() {
+  overviewOptions(callback) {
     this._open();
-    this._popUpOverviewOptions.display();
+    this._popUpOverviewOptions.display(callback);
   }
 }
 
@@ -442,6 +443,7 @@ class PopUpOverviewOptions {
   constructor(parent) {
     this._parent = parent;
     this._form = document.getElementById("overview-options-form");
+    this._callback = null;
     this._init();
   }
 
@@ -452,7 +454,7 @@ class PopUpOverviewOptions {
   _addEventListeners() {
     handleSubmitEvent(this._form, async (values) => {
       console.log(values);
-
+      // await this._database.options.set("goal", values.goal);
       try {
         // db stuff
       } catch(error) {
@@ -461,11 +463,14 @@ class PopUpOverviewOptions {
 
       this._close();
       this._parent.close();
+      this._callback();
     });
   }
 
-  async display() {
+  async display(callback) {
     this._open();
+    // XXX uh feels strange...
+    this._callback = callback;
   }
 
   _open(food) {
