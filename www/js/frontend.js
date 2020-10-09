@@ -48,9 +48,10 @@ class Header {
 }
 
 class Overview {
-  constructor({ database, date }) {
+  constructor({ database, date, popUp }) {
     this._database = database;
     this._date = date;
+    this._popUp = popUp;
     this._openOptions = document.getElementById("toggle-overview-options");
     this._goal = document.getElementById("overview-goal");
     this._consumed = document.getElementById("overview-consumed");
@@ -60,7 +61,13 @@ class Overview {
 
   _init() {
     this.updateOverview();
-    // this._addEventListeners();
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    this._openOptions.addEventListener("click", (_event) => {
+      this._popUp.overviewOptions();
+    });
   }
 
   async updateOverview() {
@@ -299,6 +306,7 @@ class PopUp {
     this._container = document.getElementById("panel-pop-up");
     this._closeButton = document.getElementById("panel-pop-up-exit");
     this._popUpAddFood = new PopUpAddFood(this);
+    this._popUpOverviewOptions = new PopUpOverviewOptions(this);
     this._init();
   }
 
@@ -341,6 +349,11 @@ class PopUp {
     // this._open();
     // await this._popUpAddFood.display(food);
     // this._close();
+  }
+
+  overviewOptions() {
+    this._open();
+    this._popUpOverviewOptions.display();
   }
 }
 
@@ -424,3 +437,43 @@ class PopUpAddFood {
     this._form.classList.toggle("hidden", true);
   }
 }
+
+class PopUpOverviewOptions {
+  constructor(parent) {
+    this._parent = parent;
+    this._form = document.getElementById("overview-options-form");
+    this._init();
+  }
+
+  _init() {
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    handleSubmitEvent(this._form, async (values) => {
+      console.log(values);
+
+      try {
+        // db stuff
+      } catch(error) {
+        throw error;
+      }
+
+      this._close();
+      this._parent.close();
+    });
+  }
+
+  async display() {
+    this._open();
+  }
+
+  _open(food) {
+    this._form.classList.toggle("hidden", false);
+  }
+
+  _close() {
+    this._form.classList.toggle("hidden", true);
+  }
+}
+

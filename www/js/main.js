@@ -6,6 +6,8 @@
   let database = new Database({ name: DATABASE_NAME });
   await database.ready;
 
+  let popUp = new PopUp({ database: database, date: date });
+
   let header = new Header({
     date: date,
     dateButton: document.getElementById("diary-date"),
@@ -15,7 +17,8 @@
 
   let overview = new Overview({
     database: database,
-    date: date
+    date: date,
+    popUp: popUp
   });
 
   let diary = new Diary({
