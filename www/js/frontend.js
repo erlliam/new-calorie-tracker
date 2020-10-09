@@ -1,12 +1,13 @@
 "use strict";
 
 class Header {
-  constructor({ date, dateButton, dateNext, datePrevious, diary}) {
+  constructor({ date, dateButton, dateNext, datePrevious, diary, overview }) {
     this._date = date;
     this._dateButton = dateButton;
     this._dateNext = dateNext;
     this._datePrevious = datePrevious;
     this._diary = diary;
+    this._overview = overview
     this._init();
   }
 
@@ -42,6 +43,7 @@ class Header {
     this._changeDate(days);
     this._updateText();
     this._diary.updateDiary();
+    this._overview.updateOverview();
   }
 
   _showCalender() {

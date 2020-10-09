@@ -14,18 +14,19 @@
     date: date
   });
 
+  let overview = new Overview({
+    database: database,
+    date: date,
+    popUp: popUp
+  });
+
   let header = new Header({
     date: date,
     dateButton: document.getElementById("diary-date"),
     dateNext: document.getElementById("diary-date-back"),
     datePrevious: document.getElementById("diary-date-forward"),
-    diary: diary
-  });
-
-  let overview = new Overview({
-    database: database,
-    date: date,
-    popUp: popUp
+    diary: diary,
+    overview: overview
   });
 
   let diaryOptions = new DiaryOptions({
