@@ -8,11 +8,18 @@
 
   let popUp = new PopUp({ database: database, date: date });
 
+  let diary = new Diary({
+    container: document.getElementById("diary"),
+    database: database,
+    date: date
+  });
+
   let header = new Header({
     date: date,
     dateButton: document.getElementById("diary-date"),
     dateNext: document.getElementById("diary-date-back"),
-    datePrevious: document.getElementById("diary-date-forward")
+    datePrevious: document.getElementById("diary-date-forward"),
+    diary: diary
   });
 
   let overview = new Overview({
@@ -21,11 +28,9 @@
     popUp: popUp
   });
 
-  let diary = new Diary({
-    container: document.getElementById("diary"),
+  let diaryOptions = new DiaryOptions({
     database: database,
-    date: date
+    date: date,
+    diary: diary
   });
-
-  let diaryOptions = new DiaryOptions({ database: database, date: date });
 })();

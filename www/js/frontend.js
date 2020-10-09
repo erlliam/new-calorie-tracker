@@ -1,11 +1,12 @@
 "use strict";
 
 class Header {
-  constructor({ date, dateButton, dateNext, datePrevious }) {
+  constructor({ date, dateButton, dateNext, datePrevious, diary}) {
     this._date = date;
     this._dateButton = dateButton;
     this._dateNext = dateNext;
     this._datePrevious = datePrevious;
+    this._diary = diary;
     this._init();
   }
 
@@ -40,6 +41,7 @@ class Header {
   _changeDateAndUpdateText(days) {
     this._changeDate(days);
     this._updateText();
+    this._diary.updateDiary();
   }
 
   _showCalender() {
@@ -74,7 +76,6 @@ class Overview {
     let entries = await this._database.diary.query({
       dateString: getNumericDateString(this._date) });
     let goal = (await this._database.options.get("goal")).value;
-    console.log(goal);
     let consumed = entries.reduce((consumed, entry) => {
       return consumed + entry.values.calories;
     }, 0);
@@ -98,7 +99,7 @@ class Diary {
   }
 
   _init() {
-    this._updateDiary();
+    this.updateDiary();
     this._addEventListeners();
   }
 
@@ -124,9 +125,14 @@ class Diary {
     });
   }
 
-  async _updateDiary() {
+  async updateDiary() {
+    // XXX obviously horrible
+    // we need caches and
+    // mainly split up the function
+    // one for dateChanged and one for updateDiary
     let entries = await this._database.diary.query({
       dateString: getNumericDateString(this._date) });
+    this._container.innerText = "";
     for (const entry of entries) {
       this._displayEntry(entry);
     }
@@ -163,9 +169,10 @@ class Diary {
 }
 
 class DiaryOptions {
-  constructor({ database, date }) {
+  constructor({ database, date, diary}) {
     this._database = database;
     this._date = date;
+    this._diary = diary;
     this._container = document.getElementById("diary-options");
     this._openContainer = document.getElementById("toggle-diary-options");
     this._recentFoods = document.getElementById("recent-foods");
@@ -294,6 +301,7 @@ class DiaryOptions {
       await this._database.diary.addCalories(values);
       this._addCalories.reset();
       this._openContainer.click();
+      this._diary.updateDiary();
     } catch(error) {
       console.log("Failed to add calories:", values);
       throw error;
