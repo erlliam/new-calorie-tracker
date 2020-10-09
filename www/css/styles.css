@@ -1,15 +1,29 @@
-.darken-background {
+.pop-up {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-.food-panel {
+.panel {
   max-width: 40rem;
   margin-left: auto;
   margin-right: auto;
 }
+
+.panel form {
+  background-color: #ffffff;
+  margin-left: 0;
+  padding: 1rem;
+}
+
+.panel h2 {
+  text-align: center;
+  margin: 0;
+}
+
 
 /*
 XXX
@@ -18,17 +32,6 @@ main>article should have padding 1 rem, not margin
 This escaped me because the background colors are indentical
 (body and article, same background color)
 */
-
-.food-panel form {
-  background-color: #ffffff;
-  margin-left: 0;
-  padding: 1rem;
-}
-
-.food-panel h2 {
-  text-align: center;
-  margin: 0;
-}
 
 .hidden {
   display: none;
