@@ -8,32 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="panel-pop-up" class="darken-background hidden">
-    <section class="food-panel">
-      <form id="add-food-form" class="hidden">
-        <h2>Add food</h2>
-        <div class="label-input">
-          <label>Food name</label>
-          <label id="add-food-name"></label>
-        </div>
-        <div class="label-input">
-          <label>Serving Size</label>
-          <select name="servingSize">
-            <option value="default" id="add-food-serving-size"></option>
-            <option value="single" id="add-food-serving-size-one"></option>
-          </select>
-        </div>
-        <div class="label-input">
-          <label>Number of Servings</label>
-          <input name="servings" required type="number">
-        </div>
-        <input id="add-food-key" name="foodKey" type="hidden">
-        <input type="submit" value="Add food">
-      </form>
-    </section>
-    <button id="panel-pop-up-exit" form="">Exit</button>
-  </div>
-
   <header>
     <h1><button id="diary-date">January&nbsp;1,&nbsp;1970</button></h1>
     <nav>
@@ -56,9 +30,9 @@
         </thead>
         <tbody>
           <tr>
-            <td>2000</td>
-            <td>0</td>
-            <td>2000</td>
+            <td id="overview-goal"></td>
+            <td id="overview-consumed"></td>
+            <td id="overview-remaining"></td>
           </tr>
         </tbody>
       </table>
@@ -154,10 +128,31 @@
     </article>
   </main>
 
-  <form hidden class="calender">
-    <input type="date">
-    <input type="submit" value="Go">
-  </form>
+  <div id="panel-pop-up" class="darken-background hidden">
+    <section class="food-panel">
+      <form id="add-food-form" class="hidden">
+        <h2>Add food</h2>
+        <div class="label-input">
+          <label>Food name</label>
+          <label id="add-food-name"></label>
+        </div>
+        <div class="label-input">
+          <label>Serving Size</label>
+          <select name="servingSize">
+            <option value="default" id="add-food-serving-size"></option>
+            <option value="single" id="add-food-serving-size-one"></option>
+          </select>
+        </div>
+        <div class="label-input">
+          <label>Number of Servings</label>
+          <input name="servings" required type="number">
+        </div>
+        <input id="add-food-key" name="foodKey" type="hidden">
+        <input type="submit" value="Add food">
+      </form>
+    </section>
+    <button id="panel-pop-up-exit" form="">Exit</button>
+  </div>
 
   <script src="js/helpers.js"></script>
   <script src="js/frontend.js"></script>

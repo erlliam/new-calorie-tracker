@@ -48,16 +48,35 @@ class Header {
 }
 
 class Overview {
-  constructor() {
+  constructor({ database, date }) {
+    this._database = database;
+    this._date = date;
+    this._openOptions = document.getElementById("toggle-overview-options");
+    this._goal = document.getElementById("overview-goal");
+    this._consumed = document.getElementById("overview-consumed");
+    this._remaining = document.getElementById("overview-remaining");
     this._init();
   }
 
   _init() {
-    // XXX finish the overview
-    let toggleOverviewOptions = document.getElementById("toggle-overview-options");
-    let overviewOptions = undefined;
-    console.warn("Implement initializeOverview()");
+    this.updateOverview();
     // this._addEventListeners();
+  }
+
+  async updateOverview() {
+    let entries = await this._database.diary.query({
+      dateString: getNumericDateString(this._date) });
+    let goal = 2000;
+    let consumed = entries.reduce((consumed, entry) => {
+      return consumed + entry.values.calories;
+    }, 0);
+    let remaining = goal - consumed;
+
+    console.log(consumed);
+
+    this._goal.textContent = goal;
+    this._consumed.textContent = consumed;
+    this._remaining.textContent = remaining;
   }
 }
 

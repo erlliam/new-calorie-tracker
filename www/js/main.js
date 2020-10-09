@@ -13,7 +13,10 @@
     datePrevious: document.getElementById("diary-date-forward")
   });
 
-  let overview = new Overview();
+  let overview = new Overview({
+    database: database,
+    date: date
+  });
 
   let diary = new Diary({
     container: document.getElementById("diary"),
