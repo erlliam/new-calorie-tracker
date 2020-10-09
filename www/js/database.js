@@ -12,6 +12,7 @@ class Database {
     this.ready = this._openDatabase({ name: name, version: version });
     this.food = new DatabaseFood(this);
     this.diary = new DatabaseDiary(this);
+    this.options = new DatabaseOptions(this);
   }
 
   _openDatabase({ name, version }) {
@@ -46,6 +47,9 @@ class Database {
     let diaryObjectStore = connection.createObjectStore(
       "diary", { autoIncrement: true });
     diaryObjectStore.createIndex("dateString", "dateString");
+
+    let optionsObjectStore = connection.createObjectStore(
+      "options", { keyPath: "name" });
   }
 
   _transact({ storeNames, mode }, callback) {
@@ -270,6 +274,43 @@ class DatabaseDiary {
       }
     );
     return await result;
+  }
+}
+
+class DatabaseOptions {
+  constructor(database) {
+    this._database = database;
+  }
+
+  async get(key) {
+    let resolveResult;
+    let result = new Promise((resolve) => { resolveResult = resolve; });
+
+    await this._database.transactReadOnly({ storeNames: ["options"] },
+      (stores) => {
+        let request = stores.options.get(key);
+        request.addEventListener("success", (_event) => {
+          resolveResult(request.result);
+        });
+      }
+    );
+    return await result;
+  }
+
+  async set(data) {
+    await this._database.transactReadWrite({ storeNames: ["options"] },
+      (stores) => {
+        stores.options.put(data);
+      }
+    );
+  }
+
+  async remove(key) {
+    await this._database.transactReadWrite({ storeNames: ["options"] },
+      (stores) => {
+        stores.options.delete(key);
+      }
+    );
   }
 }
 
