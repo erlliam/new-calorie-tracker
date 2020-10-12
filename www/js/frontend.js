@@ -93,10 +93,11 @@ class Overview {
 }
 
 class Diary {
-  constructor({ container, database, date }) {
+  constructor({ container, database, date, popUp }) {
     this._container = container;
     this._database = database;
     this._date = date;
+    this._popUp = popUp;
     this._init();
   }
 
@@ -110,12 +111,12 @@ class Diary {
       if (event.target.tagName !== "TD") return;
 
       let tableRow = event.target.parentElement;
-      if (!tableRow.hasAttribute("data-key")) return;
       let entryKey = parseInt(tableRow.getAttribute("data-key"));
       let entry = await this._database.diary.queryKey({
         key: entryKey });
 
       console.log(entry);
+      this._popUp.popUpEditCalories.display(entry);
 
       // XXX edit diary entries here
       // fetch food information
@@ -157,13 +158,13 @@ class Diary {
       foodServingSize.textContent = `${
         amountConsumed.toFixed(1)} ${food.unit || ""}`;
       foodCalories.textContent = caloriesConsumed.toFixed(1);
-      foodContainer.setAttribute("data-key", entry.key);
     } else if (entry.values.type === "calories") {
       foodName.textContent = entry.values.note;
       foodServingSize.textContent = "(added\u00A0calories)";
       foodCalories.textContent = entry.values.calories.toFixed(1);
     }
 
+    foodContainer.setAttribute("data-key", entry.key);
     foodContainer.classList.add("food");
     foodContainer.append(foodName, foodServingSize, foodCalories);
     this._container.append(foodContainer);
@@ -300,7 +301,8 @@ class DiaryOptions {
     }
     values.dateString = getNumericDateString(this._date);
     try {
-      await this._database.diary.addCalories(values);
+      // XXX diaryKey for when I stop rerendering everything
+      let diaryKey = await this._database.diary.addCalories(values);
       this._addCalories.reset();
       this._openContainer.click();
       this._diary.updateDiary();
@@ -319,6 +321,7 @@ class PopUp {
     this._closeButton = document.getElementById("panel-pop-up-exit");
     this._popUpAddFood = new PopUpAddFood(this);
     this._popUpOverviewOptions = new PopUpOverviewOptions(this);
+    this._popUpEditCalories = new PopUpEditCalories(this);
     this._init();
   }
 
@@ -470,6 +473,48 @@ class PopUpOverviewOptions {
           name: "goal",
           value: parseInt(values.goal)
         });
+      } catch(error) {
+        throw error;
+      }
+
+      this._close();
+      this._parent.close();
+      this._callback();
+    });
+  }
+
+  async display(callback) {
+    this._open();
+    // XXX uh feels strange...
+    this._callback = callback;
+  }
+
+  _open(food) {
+    this._form.classList.toggle("hidden", false);
+  }
+
+  _close() {
+    this._form.classList.toggle("hidden", true);
+  }
+}
+
+class PopUpEditCalories {
+  constructor(parent) {
+    this._parent = parent;
+    this._form = document.getElementById("edit-calories-form");
+    this._callback = null;
+    this._init();
+  }
+
+  _init() {
+    this._addEventListeners();
+  }
+
+  _addEventListeners() {
+    handleSubmitEvent(this._form, async (values) => {
+      console.log(values);
+      // XXX not so lazy
+      try {
       } catch(error) {
         throw error;
       }

@@ -11,7 +11,8 @@
   let diary = new Diary({
     container: document.getElementById("diary"),
     database: database,
-    date: date
+    date: date,
+    popUp: popUp
   });
 
   let overview = new Overview({

@@ -161,6 +161,21 @@
         <input type="submit" value="Set calorie goal">
       </form>
     </section>
+    <section class="panel">
+      <form id="edit-calories-form" class="hidden">
+        <h3>Edit calories</h3>
+        <div class="label-input">
+          <label>Calories</label>
+          <input name="calories" required type="number" min="0">
+        </div>
+        <div class="label-input">
+          <label>Note - <em>optional</em></label>
+          <input name="note" type="text">
+        </div>
+        <input type="hidden" name="type" value="calories">
+        <input type="submit" value="Add calories">
+      </form>
+    </section>
     <button id="panel-pop-up-exit" form="">Exit</button>
   </div>
 

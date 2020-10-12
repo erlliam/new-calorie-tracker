@@ -205,11 +205,18 @@ class DatabaseDiary {
       throw TypeError("invalid calorie entry");
     }
 
+    let resolveResult;
+    let result = new Promise((resolve) => { resolveResult = resolve; });
+
     await this._database.transactReadWrite({ storeNames: ["diary"] },
       (stores) => {
-        stores.diary.add(data);
+        let request = stores.diary.add(data);
+        request.addEventListener("success", (_event) => {
+          resolveResult(request.result);
+        });
       }
     );
+    return await result;
   }
 
   async edit({ key, data }) {
